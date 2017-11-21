@@ -1,0 +1,953 @@
+\documentclass[hidelinks, 10pt]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{gensymb}
+\usepackage{bbm}
+\usepackage{xcolor}
+\usepackage{blindtext}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{cancel}
+\usepackage{breqn}
+\usepackage{verbatim}
+\usepackage{mathtools}
+\usepackage{epsfig}
+\usepackage{epstopdf}
+\usepackage{titling}
+\usepackage{url}
+\usepackage{array}
+\usepackage{tikz}
+% \usepackage[a4paper]{geometry}
+
+\usetikzlibrary{arrows, automata, backgrounds, calendar, chains, matrix, mindmap, patterns, petri, shadows, shapes.geometric, shapes.misc, spy, trees}
+
+\author{Alessandra Micheletti}
+\date{A.A. 2017-2018}
+\title{Esercizi CPSM 2}
+
+\DeclareMathOperator{\var}{var}
+\DeclareMathOperator{\cov}{cov}
+\DeclareMathOperator{\argmax}{\arg\max}
+\DeclareMathOperator{\argmin}{\arg\min}
+\begin{document}
+\newcommand{\defeq}{\vcentcolon=}
+\newcommand{\eqdef}{=\vcentcolon}
+\providecommand{\ML}[1]{\hat{#1}_{\text{ML}}}
+\providecommand{\compl}[1]{\prescript{c}{}{#1}}
+
+\theoremstyle{plain}
+\newtheorem{thm}{Teorema}[]
+\renewcommand{\thesection}{\arabic{section}}
+
+\theoremstyle{definition}
+\newtheorem{defn}[]{Definizione}
+\newtheorem{prop}[]{Proposizione}
+\newtheorem{cor}[]{Corollario}
+\newtheorem{lem}[]{Lemma}
+\newtheorem{oss}[]{Osservazione}
+\newtheorem{nota}[]{Nota}
+\newtheorem{es}[]{Esempio}
+\newtheorem{ex}[]{Esercizio}
+
+\maketitle
+
+\section{Esercitazione del 6 ottobre 2017}
+\begin{ex}
+Sia $ X_1, \dotsc, X_n \sim B(1, \theta) $ i.i.d.. Mostrare che $ T = \sum\limits_{i = 1}^{n} X_i $ \`e sufficiente per $ \theta $. 
+\end{ex}
+\begin{proof}
+Se $ L(\underline{x}, \theta) $ si pu\`o fattorizzare come $ g(T(\underline{x}), \theta) h(\underline{X}) $ allora $ T $ \`e sufficiente.
+
+$ L(\underline{x}, \theta) = \prod\limits_{i = 1}^{n} [\theta^{x_i} (1 - \theta)^{1 - x_i} \mathbbm{1}_{\{0, 1 \}} (x_i) ] = \theta^{\sum\limits_{i = 1}^{n} x_i} (1 - \theta)^{n - \sum\limits_{i = 1}^{n} x_i} \prod\limits_{i = 1}^{n} \mathbbm{1}_{\{ 0, 1 \}} (x_i) = \underbrace{\left( \frac{\theta}{1 - \theta} \right)^{T(\underline{x})} (1 - \theta)^n}_{g(T(\underline{x}), \theta)} \underbrace{\prod\limits_{i = 1}^{n} \mathbbm{1}_{\{ 0, 1 \}} (x_i)}_{h(\underline{x})} $
+\end{proof}
+
+\begin{ex}[11.1.3 Roussas]
+Siano $ X_1, X_2 $ variabili aleatorie i.i.d. con pdf $ f(\cdot, \theta) $ data da
+
+\begin{itemize}
+\item $  f(0, \theta) = e^{- \theta} $
+\item $  f(1, \theta) = \theta e^{- \theta} $
+\item $  f(2, \theta) = 1 - e^{- \theta} - \theta e^{-\theta} $
+\item $  f(x, \theta) = 0, \forall\ x \ne 0, 1, 2 $
+\end{itemize}
+
+Mostrare che $ T = X_1 + X_2 $ non \`e sufficiente per $ \theta $.
+\end{ex}
+
+\begin{proof}
+Si deve mostrare che esistono $ x_1 $ e $ x_2 $ tali che $ {\mathbb{P}(X_1 = x_1, X_2 = x_2 \vert T = x_1 + x_2)} $ dipenda da $ \theta $.
+
+$ \mathbb{P}(X_1 = 1, X_2 = 1 \vert T = 2) = \frac{\mathbb{P}(X_1 = 1, X_2 = 1, T = 2)}{\mathbb{P}(X_1 + X_2 = 2)} = \frac{\mathbb{P}(X_1 = 1, X_2 = 1)}{\mathbb{P}(X_1 = 1, X_2 = 1) + \mathbb{P}(X_1 = 2, X_2 = 0) + \mathbb{P}(X_1 = 0, X_2 = 2)} = \frac{\theta^2 e^{-2 \theta}}{\theta^2 e^{-2 \theta} + 2 e^{-\theta} (1 - e^{- \theta} - \theta e^{-\theta})} = \frac{\theta^2 \cancel{e^{-2 \theta}}}{\cancel{e^{-2 \theta}} (\theta^2 + 2 e^{\theta} - 2 - 2 \theta)} $, che dipende da $ \theta $ e quindi $ T $ non \`e sufficiente.
+\end{proof}
+
+
+\begin{ex}[11.1.8 Roussas]
+Siano $ X_1, \dotsc, X_n $ i.i.d. con pdf $ f(x, \theta) = e^{-(x-\theta)} \mathbbm{1}_{[\theta, +\infty)} (x) $, con $ \theta \in \mathbb{R} $. Trovare se esiste una statistica sufficiente per $ \theta $.
+\end{ex}
+
+\begin{proof}
+$ L(x, \theta) = \prod\limits_{i = 1}^{n} e^{-(x_i - \theta)} \mathbbm{1}_{[\theta, +\infty)} (x_i) = e^{- \sum\limits_{i = 1}^{n} (x_i - \theta)} \underbrace{\prod\limits_{i = 1}^{n} \mathbbm{1}_{[\theta, +\infty)} (x_i)}_{= 1 \iff \theta \le x_i, \forall\ i \iff \theta \le \min\limits_i x_i} = \underbrace{e^{- \sum\limits_{i = 1}^{n} x_i}}_{h(\underline{x})} \underbrace{e^{n \theta} \mathbbm{1}_{(-\infty, \min\limits_i x_i]} (\theta)}_{g(\theta, T)} $, quindi $ T = \min\limits_i x_i $, sufficiente per $ \theta $.
+\end{proof}
+
+
+\begin{ex}
+Trovare una statistica sufficiente per $ \theta $ con $ X_1, \dotsc, X_n $ i.i.d. aventi pdf $ f(x, \theta) = (1 + \theta) x^{\theta} \mathbbm{1}_{(0, 1)} (x) $, con $ \theta > 0 $. 
+\end{ex}
+
+\begin{proof}
+$ L(\underline{x}, \theta) = \prod\limits_{i = 1}^{n} \left[ (1 + \theta) x_i^{\theta} \mathbbm{1}_{(0,1)} (x_i) \right] = (1 + \theta)^n \left( \prod\limits_{i = 1}^{n} x_i \right)^{\theta} \prod\limits_{i = 1}^{n} \left( \mathbbm{1}_{(0,1)} (x_i) \right) $
+
+Si potrebbe considerare come $ g(T, \theta) = (1 + \theta)^n \left( \prod\limits_{i = 1}^{n} x_i \right)^{\theta} $ e $ h(x) = \prod\limits_{i = 1}^{n} \left( \mathbbm{1}_{(0,1)} (x_i) \right) $ e stabilire $ T = \prod\limits_{i = 1}^{n} X_i $ ma non \`e l'unica. Infatti si osserva che $ f(x, \theta) $ appartiene alla famiglia esponenziale, ovvero $ f(x, \theta) = \underbrace{C(\theta)}_{> 0} e^{Q(\theta) T(x)} \underbrace{h(x)}_{h \ne h(\theta)} $, e considerando $ f(x, \theta) = \underbrace{(1 + \theta)}_{C(\theta)} e^{\underbrace{\theta}_{Q(\theta)} \underbrace{\log(x)}_{T(x)}} \underbrace{\mathbbm{1}_{(0,1)} (x)}_{h(x)} \implies T^{\ast} = \sum\limits_{i = 1}^{n} T(x_i) = \sum\limits_{i = 1}^{n} \log(x_i) $ \`e sufficiente per $ \theta $. Notare che $ T^{\ast} = \log (T) $
+\end{proof}
+
+\begin{ex}
+Siano $ X_1, \dotsc, X_n $ i.i.d. $ \sim f(x, \theta) = \theta x^{\theta - 1} \mathbbm{1}_{[0, 1]} (x) $, con $ \theta > 0 $.
+\begin{enumerate}
+\item Determinare lo stimatore ML di $ \theta, \ML{\theta} $;
+\item $ \ML{\theta} $ \`e sufficiente per $ \theta $?
+\item Esistono altri stimatori sufficienti per $ \theta $?
+\end{enumerate}
+\end{ex}
+\begin{proof}
+\noindent
+\begin{enumerate}
+\item $ L(\underline{x}, \theta) = \theta^{n} \prod\limits_{i = 1}^{n} \left( x_i^{\theta - 1} \mathbbm{1}_{[0,1]} (x_i) \right) $.
+
+$ \ML{\theta} = \argmax\limits_{\theta} L(\underline{x}, \theta) = \argmax\limits_{\theta} \log L(\underline{x}, \theta) $, quindi $ \log L(\underline{x}, \theta) = m \log \theta + (\theta - 1) \sum\limits_{i = 1}^{n} \log x_i $, con $ x_i \in [0,1] $.
+
+Derivando, si ottiene $ \frac{\mathrm{d}}{\mathrm{d}\theta} \log L = \frac{n}{\theta} + \sum\limits_{i = 1}^{n} \log x_i = 0 \implies \ML{\theta} = - \frac{n}{\sum\limits_{i = 1}^{n} \log x_i} > 0 $. Derivando ancora, $ \frac{\mathrm{d^2}}{\mathrm{d}\theta^2} \log L = - \frac{n}{\theta^2} < 0 $, quindi $ \ML{\theta} $ \`e il punto di massimo;
+\item $ L(\underline{x}, \theta) = \theta^n \left( \prod\limits_{i = 1}^{n} e^{(\theta - 1) \log x_i} \right) \left( \prod\limits_{i = 1}^{n} \mathbbm{1}_{[0, 1]} (x_i) \right) = \theta^{n} e^{\theta - 1} e^{\sum\limits_{i = 1}^{n} \log x_i} \prod\limits_{i = 1}^{n} \mathbbm{1}_{[0,1]} (x_i) = \underbrace{\theta^{n} e^{-n(\theta - 1)} e^{-\frac{\sum\limits_{i = 1}^{n} \log x_i}{n}}}_{g(\ML{\theta}, \theta)} \underbrace{\prod\limits_{i = 1}^{n} \mathbbm{1}_{[0,1]} (x_i)}_{h(\underline{x})} $, quindi $ \ML{\theta} $ \`e sufficiente per $ \theta $;
+\item $ L(\underline{x}, \theta) = \underbrace{\theta^{n} \left( \prod\limits_{i = 1}^{n} x_i \right)^{\theta - 1}}_{g(\tilde{T}, \theta)} \underbrace{\prod\limits_{i = 1}^{n} \mathbbm{1}_{[0,1]} (x_i)}_{h(\underline{x})} $. $ \tilde{T} = \prod\limits_{i = 1}^{n} x_i $ ma $ \ML{\theta} = - \frac{n}{\log \tilde{T}} $ % TODO: grafico
+\end{enumerate}
+\end{proof}
+
+\begin{ex}
+Trovare una statistica sufficiente per $ \theta $ considerando un campione $ X_1, \dotsc, X_n $ i.i.d. avente pdf $ f(x, \theta) = \left( \frac{\theta}{c} \right) \left( \frac{c}{x} \right)^{\theta + 1} \mathbbm{1}_{(c, +\infty)} (x) $ con $ \theta > 0 $ e $ c > 0 $ costante.
+\end{ex}
+
+\begin{proof}
+$ L(\underline{x}, \theta) = \underbrace{\left( \frac{\theta}{c} \right)^{n} c^{n(\theta + 1)} \left( \prod\limits_{i = 1}^{n} \frac{1}{x_i} \right)^{\theta + 1}}_{g(T, \theta)} \underbrace{\prod\limits_{i = 1}^{n} \mathbbm{1}_{(c, +\infty)} (x_i)}_{h(\underline{x})} $, quindi $ T = \prod\limits_{i = 1}^{n} \frac{1}{x_i} $ \`e sufficiente per $ \theta $. Osservo che $ \left( \prod\limits_{i = 1}^{n} \frac{1}{x_i} \right)^{\theta + 1} = \left( \frac{1}{\prod\limits_{i = 1}^{n} x_i} \right)^{\theta + 1} \implies \tilde{T} = \prod\limits_{i = 1}^{n} x_i $ \`e sufficiente, quindi $ T^{\ast} = \log \tilde{T} = \sum\limits_{i = 1}^{n} \log x_i $ \`e sufficiente per $ \theta $.
+\end{proof}
+
+\begin{ex}
+Sia $ f(x, \theta) = \frac{1}{\theta} \mathbbm{1}_{[\theta, 2 \theta]} (x) $ con $ \theta > 0 $
+\begin{enumerate}
+\item Tale distribuzione appartiene alla famiglia esponenziale?
+\item Trovare una statistica sufficiente per $ \theta $
+\end{enumerate}
+\end{ex}
+
+\begin{proof}
+\noindent
+\begin{enumerate}
+\item Affinch\'e la distribuzione appartenga alla famiglia esponenziale deve essere $ {f(x, \theta) = C(\theta) e^{Q(\theta) T(x)} h(x)} $ con $ C(\theta) > 0 $ e $ h(x) $ con supporto indipendente da $ \theta $ ma $ \mathbbm{1}_{[\theta, 2 \theta]} (x) $ ha supporto dipendente da $ \theta $, quindi non \`e possibile scrivere la pdf come quella di una della famiglia esponenziale;
+\item $ L(\underline{x}, \theta) = \prod\limits_{i = 1}^{n} \left( \frac{1}{\theta} \mathbbm{1}_{[\theta, 2 \theta]} (x_i) \right) = \frac{1}{\theta^n} \underbrace{\prod\limits_{i = 1}^{n} \mathbbm{1}_{[\theta, 2 \theta]} (x_i)}_{?} = \frac{1}{\theta^{n}} \mathbbm{1}_{[0, \min\limits_{i} x_i]} (\theta) \mathbbm{1}_{\left[ \frac{\max\limits_{i} x_i}{2}, +\infty \right]} (\theta) = \begin{cases} 1 & \theta \le x_i \land 2 \theta \ge x_i, \forall\ i \\ 0 & \text{altrimenti} \end{cases} $. Quindi $ \underline{T} = (\min\limits_{i} x_i, \max\limits_{i} x_i) $ \`e sufficiente con $ h(x) = 1 $
+\end{enumerate}
+\end{proof}
+
+\section{Esercitazione del 13 ottobre 2017}
+\begin{ex}
+Sia $ f(x, \theta) = \binom{n}{x} \theta^{x} (1 - \theta)^{n - x} $ con $ \theta \in [0,1] $. Mostrare che $ \mathcal{F} = \left\{ f(\underline{x}, \theta) : \theta \in [0, 1], x \in \{ 0, 1, \dotsc, n \} \subseteq \mathbb{N} \right\} $ \`e completa.
+\end{ex}
+
+\begin{proof}
+Sia $ X \sim f(x, \theta) = B(n, \theta) $. $ \forall\ g: \mathbb{R} \to \mathbb{R} $ misurabile si ha che $ \mathbb{E}_{\theta} [g(X)] = \sum\limits_{x = 0}^{n} g(x) \binom{n}{x} \theta^{x} (1 - \theta)^{n - x} = (1 - \theta)^{n} \sum\limits_{x = 0}^{n} g(x) \left( \frac{\theta}{1 - \theta} \right)^x \binom{n}{x} $. Ponendo $ \rho = \frac{\theta}{1 - \theta} \in \mathbb{R}^{+} $ si ha che $ \mathbb{E}_{\theta} [g(X)] = (1 - \theta)^{n} \sum\limits_{x = 0}^{n} g(x) \binom{n}{x} \rho^{x} = 0, \forall\ \theta \in (0,1) \iff \sum\limits_{x = 0}^{n} g(x) \binom{n}{x} \rho^x = 0, \forall\ \rho > 0 \iff g(x) \binom{n}{x} = 0, \forall\ x \in \{ 0, 1, \dotsc, n \} \subseteq \mathbb{N} \iff g(x) = 0, \forall\ x \in \{ 0, 1, \dotsc, n \} \implies g(x) = 0, \mathbb{P}_{\theta} $ q.c. $ \forall\ \theta \in (0,1) $.
+\end{proof}
+
+\begin{ex}
+Sia $ \mathcal{F} = \{ f(x, \theta) \} $ con $ \theta \in \Theta $ e $ f(x, \theta) = \binom{n}{x} \theta^{x} (1 - \theta)^{n - x} $ con $ \theta \in (0, 1) $ e $ x \in \{ 0, 1, \dotsc, n \} \subseteq \mathbb{N} $. Dimostrare che $ \mathcal{F} $ \`e una famiglia completa.
+\end{ex}
+
+\begin{proof}
+La tesi da dimostrare \`e la seguente:
+\[ \forall\ g : \mathbb{R} \to \mathbb{R} \text{ misurabile, se } \mathbb{E}_{\theta} [g(X)] = 0, \forall\ \theta \implies g(x) = 0, \mathbb{P}_{\theta}-\text{q.c.}, \forall\ \theta  \]
+
+$ \mathbb{E}_{\theta} [g(X)] = \sum\limits_{x = 0}^{n} g(x) \binom{x}{n} \theta^{x} (1 - \theta)^{n - x} = (1 - \theta)^{n} \sum\limits_{x = 0}^{n} g(x) \binom{n}{x} \left( \frac{\theta}{1 - \theta} \right)^{x} = 0, \forall\ \theta $
+\end{proof}
+
+\begin{ex}
+Siano $ X_{1}, \dotsc, X_{n} $ i.i.d. con pdf $ f(x, \theta) = \theta^{\vert x \vert} (1 - \theta)^{2 - \vert x \vert} $, $ x \in A = \{ -1, 0, 1, 2 \} $ e $ \theta \in (0, 1) $.
+
+\begin{enumerate}
+\item La distribuzione data appartiene alla famiglia esponenziale?
+\item Trovare una statistica sufficiente e completa per $ \theta $;
+\item \`E completa $ \mathcal{F} = \{ f(x, \theta) \}_{\theta \in (0, 1)} $?
+\item Si trovi uno stimatore di massima verosimiglianza per $ \theta $;
+\item $ \ML{\theta} $ \`e non distorto? \`E UMVU?
+\item $ \ML{\theta} $ \`e debolmente consistete?
+\end{enumerate}
+\end{ex}
+
+\begin{proof}
+\noindent
+\begin{enumerate}
+\item $ f(x, \theta) = e^{\vert x \vert \log \theta + (2 - \vert x \vert) \log (1 - \theta)} \mathbbm{1}_{A} (x) = e^{\vert x \vert [\log \theta - \log (1 - \theta)]  + 2 \log (1 - \theta)} \mathbbm{1}_{A} (x) = e^{\overbrace{\vert x \vert}^{T(x)} \overbrace{[\log \theta - \log (1 - \theta)]}^{Q(\theta)}} \underbrace{e^{\left( 2 \log (1 - \theta) \right)}}_{C(\theta)} \underbrace{\mathbbm{1}_{A} (x)}_{h(x)} $;
+\item $ \tilde{T} = \sum\limits_{i = 1}^{n} T(X_i) = \sum\limits_{i = 1}^{n} \vert x_{i} \vert $ \`e sufficiente e completa poich\'e $ \theta \in (0, 1) $, che \`e un intervallo;
+\item $ f(x, \theta) = \begin{cases} \theta(1 - \theta) & x = - 1 \\ (1 - \theta)^{2} & x = 0 \\ \theta (1 - \theta) & x = 1 \\ \theta^{2} & x = 2 \end{cases} $
+
+$ \mathbb{E}_{\theta} [g(X)] = \sum\limits_{k = -1}^{2} g(k) f(k, \theta) $. Se si considera $ g(x) = \begin{cases} x & x = 1, -1 \\ 0 & \text{altrove} \end{cases} \not\equiv 0 $ si ha $ \mathbb{E}_{\theta} [g(X)] = \theta(1 - \theta) - \theta(1 - \theta) = 0, \forall\ \theta \implies g $ non \`e completa, cio\`e $ \mathbb{E}_{\theta} [g(T(X))] = 0, \forall\ \theta \cancel{\implies} g(x) \equiv 0 $;
+\item $ L(\underline{x}, \theta) = \theta^{\sum\limits_{i = 1}^{n} \vert x_{i} \vert} (1 - \theta)^{2n - \sum\limits_{i = 1}^{n} \vert x_{i} \vert} $ con $ x_{i} \in \{ -1, 0, 1, 2 \} $.
+
+Dato che $ \ML{\theta} = \argmax\limits_{\theta} L = \argmax\limits_{\theta} \log L $ si ha che $ \log L = \sum\limits_{i = 1}^{n} \vert x_{i} \vert \log \theta + (2n -\sum\limits_{i = 1}^{n} \vert x_{i} \vert) \log (1 - \theta) $. Derivando:
+
+\[ \frac{\mathrm{d}}{\mathrm{d} \theta} \log L = \frac{\sum\limits_{i = 1}^{n} \vert x_{i} \vert}{\theta} - \frac{2n - \sum\limits_{i = 1}^{n} \vert x_{i} \vert}{1 - \theta} = \frac{\sum\limits_{i = 1}^{n} \vert x_{i} \vert - \cancel{\theta \sum\limits_{i = 1}^{n} \vert x_{i} \vert} - 2 n \theta + \cancel{\theta \sum\limits_{i = 1}^{n} \vert x_{i} \vert} }{\theta(1 - \theta)} = \frac{\sum\limits_{i = 1}^{n} \vert x_{i} \vert - 2 n \theta}{\theta (1 - \theta)} \]
+
+Impostato uguale a zero, si ha che $ \ML{\theta} = \frac{\sum\limits_{i = 1}^{n} \vert x_{i} \vert}{2 n} $. \`E un massimo? Si pu\`o derivare un'altra volta oppure guardando il segno del numeratore della derivata prima, che \`e positivo se $ \theta < \ML{\theta} $, quindi $ \ML{\theta} $ \`e un massimo;
+\item $ \vert X \vert = \begin{cases} 0 & prob = (1 - \theta)^{2} \\ 1 & prob = 2 \theta(1 - \theta) \\ 2 & prob = \theta^{2} \end{cases} \sim B(2, \theta) \implies \mathbb{E}_{\theta} [\vert X \vert] = 2 \theta $, quindi $ \mathbb{E}_{\theta} [\ML{\theta}] = \mathbb{E} \left[ \frac{\sum\limits_{i = 1}^{n} \vert x_{i} \vert}{2n} \right] \frac{1}{\cancel{2n}} \cancel{2n} \theta = \theta $.
+
+$ \ML{\theta} $ \`e non distorto, dipende solo da $ \tilde{T} = \sum\limits_{i = 1}^{n} \vert X_{i} \vert $, che \`e sufficiente e completa e per il teorema di Lehmann-Scheff\'e \`e UMVU;
+\item \[ \lim_{n \to +\infty} \var_{\theta} (\ML{\theta}) = \lim_{n \to +\infty} \var_{\theta} \left( \frac{\sum\limits_{i = 1}^{n} \vert x_{i} \vert}{2n} \right) \]
+
+Per l'indipendenza degli $ X_{i} $ si ha quindi che:
+
+\[ \lim_{n \to +\infty} \var_{\theta} \left( \frac{\sum\limits_{i = 1}^{n} \vert x_{i} \vert}{2n} \right) = \lim_{n \to +\infty} \frac{1}{4 n^{2}} \sum\limits_{i = 1}^{n} \var_{\theta} (\vert X_{i} \vert) \]
+
+Dato che $ \vert X_{i} \vert \sim B(2, \theta) $ si ha che $ \var (X_{i}) = 2 \theta(1 - \theta) $ e quindi $ \lim\limits_{n \to +\infty} \frac{1}{4 n^{2}} \sum\limits_{i = 1}^{n} \var_{\theta} (\vert X_{i} \vert) = \lim\limits_{n \to +\infty} \frac{1}{4 n^{2}} \sum\limits_{i = 1}^{n} 2 \theta (1 - \theta) = \lim\limits_{n \to +\infty} \frac{1}{4 n^{\cancel{2}}} 2 \cancel{n} \theta (1 - \theta) \to 0 $, quindi $ \ML{\theta} $ \`e debolmente consistente.
+\end{enumerate}
+\end{proof}
+
+\begin{ex}
+Siano $ X_{1}, \dotsc, X_{n} $ i.i.d. $ \sim f(x, \theta) = \frac{1}{\theta} \mathbbm{1}_{[0, \theta]} (x) $, con $ \theta \in \mathbb{R}^{+} $. Trovare una statistica sufficiente e completa per $ \theta $.
+\end{ex}
+
+\begin{proof}
+$ L(x, \theta) = \frac{1}{\theta^{n}} \prod\limits_{i = 1}^{n} \mathbbm{1}_{[0, \theta]} (x) = \frac{1}{\theta^{n}} \prod\limits_{i = 1}^{n} \mathbbm{1}_{[x_i, +\infty)} (\theta) = \frac{1}{\theta^{n}} \prod\limits_{i = 1}^{n} \mathbbm{1}_{\left[ \max\limits_{1 \le i \le n} x_i, +\infty \right)} (\theta) = g(T(\underline{x}, \theta)) \cdot 1 $
+
+$ T(\underline{x}) = \max\limits_{1 \le i \le n} x_{i} $ \`e sufficiente. Quanto vale $ \mathbb{E}_{\theta} [g(T(\underline{X}))] $?
+
+$ F_{T} (x) = \mathbb{P} (T \le x) = \begin{cases} 0 & x < 0 \\ \ast & x \in (0, \theta) \\ 1 & x \ge \theta \end{cases} $, da cui si ricava che $ \ast = \mathbb{P} (T \le x) = \mathbb{P} (X_{1} \le x, \dotsc, X_{n} \le x) $, che per l'indipendenza \`e uguale a $ [\mathbb{P} (X \le x)]^{n} \stackrel{X \sim f}{=} [F(x)]^{n} = \left( \frac{x}{\theta} \right)^{n} $, con $ x \in (0, \theta) $. Difatti, la pdf \`e definita da
+
+\[ f(x, \theta) = \begin{cases}
+\frac{n}{\theta^{n}} x^{n - 1} & x \in (0, \theta) \\
+0 & \text{altrove}
+\end{cases} \]
+
+$ 0 = \mathbb{E}_{\theta} [g(T)] = \int\limits_{0}^{\theta} g(x) \frac{n}{\theta^{n}} x^{n-1} \, \mathrm{d}x = \frac{n}{\theta^{n}} \int\limits_{0}^{\theta} g(x) x^{n - 1} \, \mathrm{d}x, \forall\ \theta > 0 \implies \int\limits_{0}^{\theta} g(x) x^{n - 1} \, \mathrm{d}x = 0, \forall\ \theta > 0 $. Derivando rispetto a $ \theta $ si ha che $ g(\theta)\theta^{n - 1} = 0, \forall\ \theta > 0 \implies g(\theta) \equiv 0, \forall\ \theta \in \mathbb{R}^{+}$
+\end{proof}
+
+\begin{ex}
+Mostrare che la famiglia delle $ U(-\theta, \theta) $ non \`e completa.
+\end{ex}
+
+\begin{proof}
+$ \mathcal{F} = \{ f(x, \theta) = \frac{1}{2 \theta} \mathbbm{1}_{[-\theta, \theta]} (x), \theta > 0 \} $. Se $ g(x) = x \not\equiv 0 $ si ha che $ \mathbb{E}_{\theta} [g(X)] = \mathbb{E}_{\theta} [x] = 0, \forall\ \theta $ e quindi $ \mathcal{F} $ non \`e completa.
+\end{proof}
+
+\begin{ex}
+Sia $ X \sim B (1, \theta) $, con $ \theta \in (0,1) $ e $ X_{1}, \dotsc, X_{n} $ i.i.d. come $ X $.
+\begin{enumerate}
+\item Trovare uno stimatore ML per $ g(\theta) = (1 - \theta)^{2} $;
+\item Trovare uno stimatore UMVU per $ g(\theta) $.
+\end{enumerate}
+\end{ex}
+
+\begin{proof}
+\noindent
+\begin{enumerate}
+\item Quando $ g $ \`e continua si pu\`o usare il principio di invarianza degli stimatori ML, cio\`e se $ \ML{\theta} $ \`e uno stimatore di massima verosimiglianza di un parametro $ \theta \in \Theta \subseteq \mathbb{R} $ e $ g : \Theta \to \Theta^{\ast} \subseteq \mathbb{R} $ \`e una funzione misurabile, allora $ g(\ML{\theta}) $ \`e uno stimatore ML di $ g(\theta) $.
+
+$ L(\underline{x}, \theta) = \prod\limits_{i = 1}^{n} \theta^{x_{i}} (1 - \theta)^{1 - x_{i}} = \theta^{\sum\limits_{i = 1}^{n} x_{i}} (1 - \theta)^{n - \sum\limits_{i = 1}^{n}} \implies \log L(\underline{x}, \theta) = \sum\limits_{i = 1}^{n} x_{i} \log \theta + (n - \sum\limits_{i = 1}^{n} x_{i}) \log (1 - \theta) \implies \frac{\mathrm{d}}{\mathrm{d} \theta} \log L(\underline{x}, \theta) = \frac{\sum\limits_{i = 1}^{n} x_{i}}{\theta} - \frac{n - \sum\limits_{i = 1}^{n}}{1 - \theta} = 0 \implies \theta = \frac{\sum\limits_{i = 1}^{n} x_{i}}{n} = \overline{X}_{n} $. Bisogna studiarne il segno per capire se \`e un massimo.
+
+$ \implies \tilde{\theta} = g(\ML{\theta}) = (1 - \overline{X}_{n})^{2} $ \`e stimatore ML di $ g(\theta) $;
+\item $ f(x, \theta) = \theta^{x} (1 - \theta)^{1 - x} \mathbbm{1}_{\{ 0, 1 \}} (x) = \left( \frac{\theta}{1 - \theta} \right)^{x} (1 - \theta) \mathbbm{1}_{\{0, 1\}} (x) = \underbrace{(1 - \theta)}_{C(\theta)} e^{\underbrace{x}_{T(x)} \underbrace{\log \frac{\theta}{1 - \theta}}_{Q(\theta)}} \underbrace{\mathbbm{1}_{\{0, 1\}} (x)}_{h(x)} $ con $ \theta \in (0,1) $, che \`e un intervallo e quindi, per il teorema di Lehmann-Scheff\'e, $ \tilde{T} = \sum\limits_{i = 1}^{n} T(x_{i}) = \sum\limits_{i = 1}^{n} x_{i} $ \`e sufficiente e completa per $ \theta $. Se trovo $ U $ non distorta per $ g(\theta) $ allora $ \phi (\tilde{T}) = \mathbb{E}_{\theta} [U \vert \tilde{T}] $ \`e stimatore UMVU per $ g(\theta) $.
+
+$ g(\theta) = (1 - \theta)^{2} $ e dato che le $ X_{i} $ sono bernulliane, suppongo $ n \ge 2 $.
+
+$ U = \begin{cases} 1 & X_{1} = X_{2} = 0 \\ 0 & \text{altrimenti} \end{cases} $ da cui $ \mathbb{E} [U] = 1 \cdot \mathbb{P} (X_{1} = 0, X_{2} = 0) + 0 \cdot \mathbb{P} (\cdots) = (1 - \theta)^{2} $, perci\`o $ \phi (\tilde{T}) = \mathbb{E} [U \vert \tilde{T}] $ \`e UMVU. Com'\`e fatta?
+
+$ \mathbb{E} [U \vert \tilde{T} = k] $, con $ k \in \{ 0, \dotsc, n \} $, \`e uguale a $ 1 \cdot \mathbb{P} (X_{1} = 0, X_{2} = 0 \vert \tilde{T} = k) = \frac{\mathbb{P} \left( X_{1} = 0, X_{2} = 0, \sum\limits_{i = 1}^{n} X_{i} = k \right)}{\mathbb{P} \left( \sum\limits_{i = 1}^{n} X_{i} = k \right)} = \frac{\mathbb{P} \left( X_{1} = 0, X_{2} = 0, \sum\limits_{i = 3}^{n} X_{i} = k \right)}{\mathbb{P} \left( \sum\limits_{i = 1}^{n} X_{i} = k \right)} $, che, per l'indipendenza della variabile aleatoria, si ha che \`e uguale a $ \frac{\mathbb{P} (X_{1} = 0) \mathbb{P} (X_{2} = 0) \mathbb{P} \left( \sum\limits_{i = 3}^{n} X_{i} = k \right)}{\mathbb{P} \left( \sum\limits_{i = 1}^{n} X_{i} = k \right)} = \frac{\cancel{(1 - \theta)^{2}} \binom{n - 2}{k} \cancel{\theta^{k}} \cancel{(1 - \theta)^{n - 2 - k}}}{\binom{n}{k} \cancel{\theta}^{k} \cancel{(1 - \theta)^{n - k}}} = \frac{\binom{n - 2}{k}}{\binom{n}{k}} = \frac{\frac{(n - 2)!}{\cancel{k!} (n - 2 - k)!}}{\frac{n!}{\cancel{k!} (n - k)!}} = \frac{(n - 2)! (n - k)!}{(n - 2 - k)! n!} = \frac{(n - k)(n - k - 1)}{n (n - 1)} $
+
+Da ci\`o si ricava che $ \phi (\tilde{T}) = \frac{(n - \tilde{T})(n - \tilde{T} - 1)}{n (n - 1)} $, con $ \tilde{T} = \sum\limits_{i = 1}^{n} X_{i} $.
+\end{enumerate}
+\end{proof}
+
+\section{Esercitazione del 20 ottobre 2017}
+\begin{ex}
+Siano $ X_{1}, \dotsc, X_{n} \sim B(1, \theta) $. Lo stimatore di $ \theta $, $ \overline{X}_{n} = \frac{1}{n} \sum\limits_{i = 1}^{n} X_{i} $ \`e UMVU per $ \theta $. \`E persino efficiente? 
+\end{ex}
+
+\begin{proof}
+$ f(x, \theta) = \theta^{x} (1 - \theta)^{1 - x} $ con $ x \in \{ 0, 1 \} \implies \log f(x, \theta) = x \log \theta + (1 - x) \log (1 - \theta) $. Derivando si ottiene $ \frac{\mathrm{d}}{\mathrm{d} \theta} \log f(x, \theta) = \frac{x}{\theta} - \frac{1 - x}{1 - \theta} $, che, elevato al quadrato,  diventa $ \left( \frac{\mathrm{d}}{\mathrm{d} \theta} \log f(x, \theta) \right)^{2} = \left( \frac{x}{\theta} - \frac{1 - x}{1 - \theta} \right)^{2} = \frac{x^{2}}{\theta^{2}} + \frac{(1 - x)^{2}}{(1 - \theta)^{2}} - 2 \frac{x (1 - x)}{\theta (1 - \theta)} $
+
+Considerando $ X = \begin{cases} 1 & prob = \theta \\ 0 & prob = 1 - \theta \end{cases} $, allora $ X^{2} \simeq X \sim B(1, \theta) $ mentre $ 1 - X = \begin{cases} 0 & prob = \theta \\ 1 & prob = 1 - \theta \end{cases} \sim B (1, 1 - \theta) $.
+
+$ (1 - X)^{2} \sim B(1, 1 - \theta) $ mentre $ X(1 - X) = 0 $ q.c.
+
+Da ci\`o si ricava che $ \mathbb{E}_{\theta} \left[ \left( \frac{\mathrm{d}}{\mathrm{d} \theta} \log f(x, \theta) \right)^{2} \right] = \frac{\cancel{\theta}}{\theta^{\cancel{2}}} + \frac{\cancel{1 - \theta}}{(1 - \theta)^{\cancel{2}}} + 0 = \frac{1}{\theta(1 - \theta)} = \tilde{I}(\theta) $
+
+Dato che $ I(\theta) = n \tilde{I} (\theta) = \frac{n}{\theta (1 - \theta)} $ allora per il limite di Cramer-Rao si ha che $ \frac{\tau'(\theta)}{I(\theta)} = \frac{1}{I(\theta)} = \frac{\theta (1 - \theta)}{n} $ e quindi $ \var_{\theta} (\overline{X}_{n}) = \frac{\theta(1 - \theta)}{n} $, da cui $ \overline{X}_{n} $ \`e efficiente.
+\end{proof}
+
+\begin{ex}
+Siano $ X_{1}, \dotsc, X_{n} $ i.i.d. $ \sim N(\theta, \sigma^{2}) $ con $ \theta $ incognito e $ \sigma^{2} $ nota. So che $ \overline{X}_{n} $ \`e UMVU per $ \theta $. \`E anche efficiente?
+\end{ex}
+
+\begin{proof}
+Ci sono due metodi che si possono usare:
+\begin{enumerate}
+\item $ L(\underline{x}, \theta) = \left( \frac{1}{2 \pi \sigma^{2}} \right)^{\frac{n}{2}} \exp \left( - \sum\limits_{i = 1}^{n} \frac{(x_{i} - \theta)^{2}}{2 \sigma^{2}} \right) \implies \log L(\underline{x}, \theta) = \frac{n}{2} \log \left( \frac{1}{2 \pi \sigma^{2}} \right) - \sum\limits_{i = 1}^{n} \frac{(x_{i} - \theta)^{2}}{2 \sigma^{2}} $. Derivando si ottiene $ \frac{\mathrm{d}}{\mathrm{d} \theta} \log L(\underline{x}, \theta) = \sum\limits_{i = 1}^{n} \frac{(x_{i} - \theta)}{\sigma^{2}} $. Si pu\`o scrivere questa quantit\`a nella forma $ A(\theta) [\overline{X}_{n} - \theta] $?
+S\`i, infatti $ \frac{\mathrm{d}}{\mathrm{d} \theta} \log L(\underline{x}, \theta) = \sum\limits_{i = 1}^{n} \frac{(x_{i} - \theta)}{\sigma^{2}} = \frac{1}{\sigma^{2}} [n \overline{X}_{n} - n \theta] = \frac{n}{\sigma^{2}} [\overline{X}_{n} - \theta] $ e quindi $ \overline{X}_{n} $ \`e efficiente.
+\item $ \var_{\theta}(\overline{X}_{n}) = \frac{\sigma^{2}}{n} $. Con il limite di Cramer-Rao si ottiene che $ \frac{1}{I(\theta)} = \frac{1}{n \mathbb{E}_{\theta} \left[ \left( \frac{\mathrm{d}}{\mathrm{d} \theta} \log f(x, \theta) \right)^{2} \right]} $ e quindi $ \frac{\mathrm{d}}{\mathrm{d} \theta} \log f(x, \theta) = \frac{1}{\sigma} \frac{x - \theta}{\sigma} \implies \left( \frac{\mathrm{d}}{\mathrm{d} \theta} \log f(x, \theta) \right)^{2} = \frac{1}{\sigma^{2}} \underbrace{\left( \frac{x - \theta}{\sigma} \right)^{2}}_{\mathclap{\sim \chi^{2}_{1} \implies \mathbb{E}_{\theta} [\cdot] = 1}} \implies \mathbb{E}_{\theta} \left[ \left( \frac{\mathrm{d}}{\mathrm{d} \theta} \log f(x, \theta) \right)^{2} \right] = \frac{1}{\sigma^{2}} $ e per il limite di Cramer-Rao, $ \frac{1}{n \frac{1}{\sigma^{2}}} = \frac{\sigma^{2}}{n} = \var_{\theta}(\overline{X}_{n}) $
+\end{enumerate}
+\end{proof}
+
+\begin{ex}
+Siano $ X_{1}, \dotsc, X_{n} $ i.i.d. $ \sim \Gamma(\alpha, \theta) $ con $ \alpha $ noto, ovvero con pdf
+
+\[ f(x, \theta) = \frac{1}{\Gamma(\alpha)} \theta^{\alpha} e^{- \theta x} x^{\alpha - 1} \mathbbm{1}_{[0, +\infty)} (x) \]
+
+con $ \theta \in (0, +\infty) = \Theta $. Cercare uno stimatore ottimale (UMVU) per $ \theta $. Lo stimatore trovato \`e efficiente?
+\end{ex}
+
+\begin{proof}
+$ f $ appartiene alla famiglia esponenziale. Infatti:
+
+\[ f(x \theta) = \underbrace{\frac{\theta^{\alpha}}{\Gamma(\alpha)}}_{C(\theta) > 0} \exp(\underbrace{-\theta}_{Q(\theta)} \underbrace{x}_{T(\underline{x})}) \underbrace{x^{\alpha - 1} \mathbbm{1}_{[0, +\infty)} (x)}_{h(x)} \]
+
+ed essendo $ \Theta $ un intervallo si ha che $ T(\underline{X}) = \sum\limits_{i = 1}^{n} T(X_{i}) = \sum\limits_{i = 1}^{n} X_{i} $ \`e sufficiente e completa per $ \theta $.
+
+$ \mathbb{E}_{\theta} [ T(\underline{X}) ] = \sum\limits_{i = 1}^{n} \mathbb{E}_{\theta} [X_i] = n \frac{\alpha}{\theta} $ \`e purtroppo distorto. Per questo sia $ Z = \frac{1}{T} = \frac{1}{\sum\limits_{i = 1}^{n} X_i} $ e per la riproducibilit\`a delle $ \Gamma $ si ha che $ T \sim \Gamma (n \alpha, \theta) $, da cui si ricava che $ \mathbb{E}_{\theta} [Z] = \int \frac{1}{t} f_{T}(t) \, \mathrm{d}t = \int\limits_{0}^{+\infty} \frac{1}{t} \frac{1}{\Gamma(n \alpha)} \theta^{n \alpha} e^{- \theta t} t^{n \alpha - 1} \, \mathrm{d}t = \frac{\Gamma(n\alpha - 1)}{\Gamma(n \alpha - 1)} \int\limits_{0}^{+\infty} \frac{1}{t} \frac{1}{\Gamma(n \alpha)} \theta^{n \alpha} e^{- \theta t} t^{n \alpha - 1} \, \mathrm{d}t = \frac{\Gamma(n\alpha - 1)}{\Gamma(n \alpha)} \theta \int\limits_{0}^{+\infty} \underbrace{\frac{1}{\Gamma(n \alpha - 1)} \theta^{n \alpha - 1} e^{- \theta t} t^{n \alpha - 2}}_{\text{pdf di } \Gamma(n \alpha - 1, \theta)} \, \mathrm{d}t = \frac{\Gamma(n \alpha -1)}{\Gamma (n \alpha)} \theta = \frac{\cancel{\Gamma(n \alpha - 1)}}{(n \alpha) \cancel{\Gamma (n \alpha - 1)}} \theta = \frac{\theta}{n \alpha - 1} \implies U \defeq (n \alpha - 1) Z = \frac{n \alpha - 1}{\underbrace{\sum\limits_{i = 1}^{n} X_{i}}_{T}} $ \`e non distorta per $ \theta $.
+
+$ U $ non distorta funzione solo di $ T $, che \`e sufficiente e completa, allora per Lehmann-Scheff\'e si ha che $ U $ \`e anche UMVU.
+
+$ \var_{\theta} (U) = (n \alpha - 1)^{2} \var_{\theta} (Z) = (n \alpha - 1)^{2} (\mathbb{E}_{\theta} [Z^{2}] - \mathbb{E}_{\theta}^{2} [Z]) $
+
+$ \mathbb{E}_{\theta} [Z^{2}] = \int\limits_{0}^{+\infty} \frac{1}{y^{2}} \frac{1}{\Gamma(n \alpha)} \theta^{n \alpha} e^{- \theta y} y^{n \alpha - 1} \, \mathrm{d}y = \frac{\Gamma(n \alpha - 2)}{\Gamma(n \alpha)} \theta^{2} \int\limits_{0}^{+\infty} \underbrace{\frac{1}{\Gamma (n \alpha - 2)} \theta^{n \alpha - 2} e^{- \theta y} y^{n \alpha - 3}}_{\text{pdf di } \Gamma(n \alpha - 2, \theta)} \, \mathrm{d}y = \frac{\theta^{2}}{(n \alpha - 1) (n \alpha - 2)} $ quindi $ \var_{\theta} (U) = (n \alpha - 1)^{2} \left[ \frac{\theta^{2}}{(n \alpha - 1)(n \alpha - 2)} - \frac{\theta^{2}}{(n \alpha - 1)^{2}} \right] = \frac{\theta^{2}}{n \alpha - 2} $
+
+Calcoliamo il limite di Cramer-Rao. Ponendo $ x > 0 $ si ha:
+$ \left( \frac{\mathrm{d}}{\mathrm{d} \theta} \log f(x, \theta) \right)^{2} = \left( \frac{\mathrm{d}}{\mathrm{d} \theta} \left[ \log \frac{1}{\Gamma (\alpha)} + \alpha \log \theta - \theta x + \log (x^{\alpha - 1}) \right] \right)^{2} = \left( \frac{\alpha}{\theta} - x \right)^{2} = \left( \frac{\alpha}{\theta} \right)^{2} - 2 \frac{\alpha}{\theta} x + x^{2} $. $ X \sim \Gamma (\alpha, \theta) $ e quindi $ \mathbb{E}_{\theta} [X] = \frac{\alpha}{\theta} $ e $ \mathbb{E}_{\theta} [X^{2}] = \var_{\theta} (X) + \mathbb{E}_{\theta}^{2} [X] = \frac{\alpha}{\theta^{2}} + \frac{\alpha^{2}}{\theta^{2}} = \frac{\alpha + \alpha^{2}}{\theta^{2}} $
+
+$ I(\theta) = n \mathbb{E}_{\theta} \left[ \left( \frac{\mathrm{d}}{\mathrm{d} \theta} \log f(x, \theta) \right)^{2} \right] = n \left[ \left( \frac{\alpha}{\theta} \right)^{2} - 2 \left( \frac{\alpha}{\theta} \right)^{2} + \frac{\alpha + \alpha^{2}}{\theta}^{2} \right] = \frac{n \alpha}{\theta^{2}} $ 
+
+Il limite di Cramer Rao \`e quindi $ \frac{1}{I (\theta)} = \frac{\theta^{2}}{n \alpha} < \frac{\theta^{2}}{n \alpha - 2} = \var_{\theta} (U) $ e quindi $ U $ non \`e efficiente.
+\end{proof}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}
+Sia $ X_{1}, \dotsc, X_{n} $ campione con funzione di verosimiglianza $ L(\underline{x}, \theta) $, con $ \theta \in \Theta \subseteq \mathbb{R} $. Sia $ T(\underline{X}) $ uno stimatore di $ \tau(\theta) $ e siano soddisfatte le ipotesi di Cramer-Rao. Inoltre valgano:
+\begin{enumerate}
+\item $ \exists\ \frac{\mathrm{d}^{2} L}{\mathrm{d} \theta^{2}} < +\infty $
+\item $ \frac{\mathrm{d}^{2}}{\mathrm{d} \theta^{2}} \int L(\underline{x}, \theta) \, \mathrm{d}\underline{x} = \int \frac{\mathrm{d}^{2}}{\mathrm{d} \theta^{2}}  L(\underline{x}, \theta) \, \mathrm{d}\underline{x} $
+\end{enumerate}
+
+Dimostrare che $ I(\theta) = - \mathbb{E}_{\theta} \left[ \frac{\mathrm{d}^{2}}{\mathrm{d} \theta^{2}} \log L(\underline{x}, \theta) \right] $.
+\end{ex}
+
+\begin{proof}
+$ \int L(\underline{x}, \theta) \, \mathrm{d}\underline{x} = 1 \implies 0 = \frac{\mathrm{d}^{2}}{\mathrm{d} \theta^{2}} \int L(\underline{x}, \theta) \, \mathrm{d}\underline{x} = \int \frac{\mathrm{d}^{2}}{\mathrm{d} \theta^{2}} L(\underline{x}, \theta) \, \mathrm{d}\underline{x} = \int \frac{\mathrm{d}}{\mathrm{d} \theta} \left( \frac{L(\underline{x}, \theta) \frac{\mathrm{d}}{\mathrm{d} \theta} L(\underline{x}, \theta)}{L(\underline{x}, \theta)} \right) \, \mathrm{d}\underline{x} = \int \frac{\mathrm{d}}{\mathrm{d} \theta} [L (\underline{x}, \theta) \frac{\mathrm{d}}{\mathrm{d} \theta} \log L (\underline{x}, \theta)] \, \mathrm{d}\underline{x} = \int \left( \frac{\mathrm{d}^{2}}{\mathrm{d} \theta^{2}} \log L (\underline{x}, \theta) \right) L (\underline{x}, \theta) \, \mathrm{d}\underline{x} + \int \left( \frac{\mathrm{d}}{\mathrm{d} \theta} \log L (\underline{x}, \theta) \right) \underbrace{\frac{\mathrm{d}}{\mathrm{d} \theta} L (\underline{x}, \theta)}_{\mathclap{\frac{L (\underline{x}, \theta) \frac{\mathrm{d}}{\mathrm{d} \theta} L (\underline{x}, \theta)}{L (\underline{x}, \theta)} = L (\underline{x}, \theta) \frac{\mathrm{d}}{\mathrm{d} \theta} \log L (\underline{x}, \theta)}} \, \mathrm{d}\underline{x} = \int \left( \frac{\mathrm{d}^{2}}{\mathrm{d} \theta^{2}} \log L (\underline{x}, \theta) \right) L (\underline{x}, \theta) \, \mathrm{d}x + \int \left( \frac{\mathrm{d}}{\mathrm{d} \theta} \log L(\underline{x}, \theta) \right)^2 L (\underline{x}, \theta) \, \mathrm{d}x = \mathbb{E}_{\theta} \left[ \frac{\mathrm{d}^{2}}{\mathrm{d} \theta^{2}} \log L \right] + \underbrace{\mathbb{E}_{\theta} \left[ \left( \frac{\mathrm{d}}{\mathrm{d} \theta} \log L \right)^{2} \right]}_{= I(\theta)} \implies I(\theta) = - E_{\theta} \left[ \frac{\mathrm{d}^{2}}{\mathrm{d} \theta^{2}} \log L (\underline{x}, \theta) \right] $ ed essendo $ L(\underline{x}, \theta) = \prod\limits_{i = 1}^{n} f(x_{i}, \theta) $ (caso i.i.d.) si ha che $ I(\theta) = -n \mathbb{E}_{\theta} \left[ \frac{\mathrm{d}^{2}}{\mathrm{d} \theta^{2}} \log L(\underline{x}, \theta) \right] $
+
+Alternativamente:
+
+$ \frac{\mathrm{d}^{2}}{\mathrm{d} \theta^{2}} \log f = - \frac{\alpha}{\theta^{2}} \implies - n \mathbb{E}_{\theta} \left[\frac{\mathrm{d}^{2}}{\mathrm{d} \theta^{2}} \log f(\underline{x}, \theta) \right] = \frac{n \alpha}{\theta^{2}} = I(\theta) $.
+\end{proof}
+
+\begin{ex}
+Siano $ X_{1}, \dotsc, X_{n} $ i.i.d. $ \sim U(0, \theta) $ con $ f(x, \theta) = \frac{1}{\theta} $ con $ x \in (0, \theta) $. Una statistica sufficiente e completa per $ \theta $ \`e $ Y = \max\limits_{1 \le i \le n} X_{i} $.
+
+\begin{enumerate}
+\item Si cerchi una statistica UMVU;
+\item La statistica UMVU \`e anche efficiente?
+\end{enumerate}
+\end{ex}
+
+\begin{proof}
+\noindent
+\begin{enumerate}
+\item $ F_{X} (t) = \begin{cases} 0 & t \le 0 \\ \frac{t}{\theta} & t \in (0, \theta) \\ 1 & t \ge \theta \end{cases} $
+
+$ F_{Y} (t) = \begin{cases} 0 & t \le 0 \\ \mathbb{P}(Y \le t) = \mathbb{P} (X_{1} \le t, \dotsc, X_{n} \le t) = \left( \frac{t}{\theta} \right)^{n} & t \in (0, \theta) \\ 1 & t \ge \theta \end{cases} $
+
+Derivando si ottiene la densit\`a di probabilit\`a $ f_{Y} (t, \theta) = \frac{n t^{n - 1}}{\theta^{n}} \mathbbm{1}_{(0, \theta)} (t) $
+
+$ \mathbb{E}_{\theta} [Y] = \int\limits_{0}^{\theta} y \frac{n y^{n - 1}}{\theta^{n}} \, \mathrm{d}y = \frac{n}{\theta^{n}} \int\limits_{0}^{\theta} y^{n} \, \mathrm{d}y = \frac{n}{\theta^{n}} \left[ \frac{y^{n + 1}}{n + 1} \right]^{\theta}_{0} = \frac{n \theta}{n + 1} \implies U = \frac{n + 1}{n} Y = \frac{n + 1}{n} \max\limits_{1 \le i \le n} X_{i} $ \`e non distorta per $ \theta $ e dipende solo da $ Y $, che \`e sufficiente e completa, quindi $ U $ \`e UMVU.
+\item $ \var_{\theta} (U) = \mathbb{E}_{\theta} [U^{2}] - (\mathbb{E}_{\theta} [U])^{2} = \int\limits_{0}^{\theta} \frac{(n + 1)^{2}}{n^{2}} y^{2} f_{Y} (y, \theta) \, \mathrm{d}y - \theta = \int\limits_{0}^{\theta} \frac{(n + 1)^{2}}{n^{2}} \frac{n y^{n+1}}{\theta^{n}} \, \mathrm{d}y - \theta^{2} = \frac{(n + 1)^{2} \theta^{n + 2}}{n \theta^{n}(n + 2)} - \theta^{2} = \frac{\theta^{2}}{n (n + 2)} $
+
+Calcoliamo il limite di Cramer-Rao:
+
+$ \log f(x, \theta) = \log \frac{1}{\theta} = - \log \theta $. Derivando si ottiene $ \frac{\mathrm{d}}{\mathrm{d}\theta} \log f = - \frac{1}{\theta} $
+
+$ \mathbb{E}_{\theta} \left[ \left( \frac{\mathrm{d}}{\mathrm{d}\theta} \log f(\underline{x}, \theta) \right)^{2} \right] = \frac{1}{\theta^{2}} = \tilde{I}(\theta) \implies \frac{1}{I(\theta)} = \frac{\theta^{2}}{n} $
+
+Dato che non soddisfa le ipotesi del teorema di Cramer-Rao, ovvero il supporto di $ h(x) $ indipendente da $ \theta $, non \`e possibile trovare una statistica efficiente.
+\end{enumerate}
+\end{proof}
+
+\section{Esercitazione del 27 ottobre 2017}
+\begin{ex}
+\noindent
+\begin{enumerate}
+\item Determinare un test UMP per verificare:
+\begin{itemize}
+\item $ H_{0}: \theta = \theta_{0} $
+\item $ H_{1}: \theta > \theta_{0} $
+\end{itemize}
+
+basato su un campione $ X_{1}, \dotsc, X_{n} \sim N(\mu, \theta) $, dove $ \mu $ \`e parametro noto e $ \theta \in (0, +\infty) $.
+\item Trovare la funzione potenza del test
+\item Determinare il test e la sua funzione potenza nel caso $ n = 40, \theta_{0} = 4, \alpha = 0.025, \mu = 0 $
+\end{enumerate}
+\end{ex}
+
+\begin{proof}
+\noindent
+\begin{enumerate}
+\item L'esercizio si pu\`o risolvere equivalentemente in due modi:
+\begin{enumerate}
+\item Uso il lemma di Neyman-Pearson. Sia $ \theta_{1} $ che soddisfi la ipotesi alternativa, quindi $ \theta_{1} > \theta_{0} $ e verifico
+\begin{itemize}
+\item $ H_{0}: \theta = \theta_{0} $
+\item $ H_{1}: \theta = \theta_{1} $
+\end{itemize}
+
+Costruisco il rapporto di verosimiglianza: $ \frac{L(\theta_{0})}{L(\theta_{1})} = \left( \frac{\theta_{1}}{\theta_{0}} \right)^{\frac{n}{2}} \exp \left[ - \frac{\theta_{1} - \theta_{0}}{2 \theta_{0} \theta_{1}} \sum\limits_{i = 1}^{n} (X_{i} - \mu)^{2} \right] \le k \implies \log \left( \frac{L(\theta_{0})}{L(\theta_{1})} \right) =  \log \left( \left( \frac{\theta_{1}}{\theta_{0}} \right)^{\frac{n}{2}} \exp \left[ - \frac{\theta_{1} - \theta_{0}}{2 \theta_{0} \theta_{1}} \sum\limits_{i = 1}^{n} (X_{i} - \mu)^{2} \right] \right) \le \log k \implies \sum\limits_{i = 1}^{n} (X_{i} - \mu)^{2} \ge \frac{2 \theta_{0} \theta_{1}}{\theta_{1} - \theta_{0}} \left( \frac{n}{2} \log \frac{\theta_{1}}{\theta_{0}} - \log k \right) = c $
+
+$ C = \{ \underline{x} \in \mathbb{R}^{n} : \sum\limits_{i = 1}^{n} (X_{i} - \mu)^{2} \ge c \} $ ed, essendo a livello $ \alpha $, $ \mathbb{P}_{\theta_{0}} (\underline{X} \in C) = \alpha $.
+
+$ X_{i} \stackrel{H_{0}}{\sim} N(\mu, \theta_{0}) \implies \frac{(X_{i} - \mu)^{2}}{\theta_{0}} \sim \chi^{2}_{1} \implies T = \frac{1}{\theta_{0}} \sum\limits_{i = 1}^{n} (X_{i} - \mu)^{2} \sim \chi^{2}_{n} $, perci\`o $ \alpha = \mathbb{P}_{\theta_{0}} (\underline{X} \in C) = \mathbb{P}_{\theta_{0}} \left( \sum\limits_{i = 1}^{n} (X_{i} - \mu)^{2} \ge c \right) = \mathbb{P}_{\theta_{0}} \left( \frac{\sum\limits_{i = 1}^{n} (X_{i} - \mu)^{2}}{\theta_{0}} \ge \underbrace{\frac{c}{\theta_{0}}}_{c_{1}} \right) \implies F_{\chi^{2}_{n}} (c_{1}) = 1 - \alpha $
+
+$ C = \left\{ \underline{x} \in \mathbb{R}^{n} : \sum\limits_{i = 1}^{n} (X_{i} - \mu)^{2} \ge c_{\chi^{2}_{n}; 1 - \alpha} \theta_{0} \right\} $ \`e pi\`u potente $ \forall\ \theta_{1} \implies $ UMP.
+\item $ f(x, \theta) = \frac{1}{\sqrt{2 \pi \theta}} \exp \left( \underbrace{- \frac{1}{2 \theta}}_{Q(\theta)} \underbrace{(X - \mu)^{2}}_{T(X)} \right) \underbrace{1}_{h(X)} $, quindi essendo $ Q(\theta) = - \frac{1}{2 \theta} $ o meglio $ Q'(\theta) = \frac{1}{2 \theta^{2}} > 0, \forall\ \theta > 0 $ si ha che $ Q(\theta) $ \`e monotona crescente in $ (0, +\infty) $ e vale perci\`o la propriet\`a MLR in $ V(\underline{X}) = \sum\limits_{i = 1}^{n} T(X_{i}) = \sum\limits_{i = 1}^{n} (X_{i} - \mu)^{2} $.
+
+Il test UMP \`e
+\[
+\Phi (\underline{X}) = \begin{cases}
+1 & \sum\limits_{i = 1}^{n} (X_{i} - \mu)^{2} \ge c \\ 0 & \text{altrimenti}
+\end{cases}
+\]
+
+con 
+
+$ \mathbb{P}_{\theta_{0}} (\sum\limits_{i = 1}^{n} (X_{i} - \mu)^{2} \ge c) = \alpha $
+\end{enumerate}
+\item $ k(\theta) = \mathbb{P}_{\theta} (\text{rigetto } H_{0}) = \mathbb{P}_{\theta} \left(\sum\limits_{i = 1}^{n} (X_{i} - \mu)^{2} \ge c_{\chi^{2}_{n}; 1 - \alpha} \theta_{0} \right) = P_{\theta} \left( \underbrace{\frac{\sum\limits_{i = 1}^{n} (X_{i} - \mu)^{2}}{\theta}}_{\sim \chi^{2}_{n}} \ge c_{\chi^{2}_{n}; 1 - \alpha} \frac{\theta_{0}}{\theta} \right) = 1 - F_{\chi^{2}_{n}; 1 - \alpha} \left( \frac{c_{\chi^{2}_{n}; 1 - \alpha} \theta_{0}}{\theta} \right) $
+\item $ c_{\chi^{2}_{40}; 0.975} = 59.342 \implies c = \theta_{0} c_{\chi^{2}_{40}; 0.975} = 4 \cdot 59.342 = 237.368 $ quindi $ C = \{ \underline{x} \in \mathbb{R}^{n} : \sum\limits_{i = 1}^{n} (X_{i} - \mu)^{2} \ge c_{\chi^{2}_{40}; 0.975} \theta_{0} \} $. Il test sar\`a: rigetto $ H_{0} $ se $ \sum\limits_{i = 1}^{n} X_{i} \ge 237.368 $.
+
+$ k(\theta) = 1 - F_{\chi^{2}_{40}} \left( \frac{237.368}{\theta} \right) $ \`e la probabilit\`a di commettere errori del secondo tipo, cio\`e accettare  $ H_{1} $ quando \`e falsa.
+
+$ \hat{\theta} = \frac{1}{n} \sum\limits_{i = 1}^{n} (X_{i} - \mu)^{2} $
+\end{enumerate}
+\end{proof}
+
+\begin{ex}
+Sia $ X_{1}, \dotsc, X_{n} \sim U(0, \theta) $ i.i.d.. Uno stimatore UMVU di $ \theta $ \`e $ M = \max\limits_{i} X_{i} $. Un test per verificare
+\begin{itemize}
+\item $ H_{0} : \theta \le \frac{1}{2} $
+\item $ H_{1} : \theta > \frac{1}{2} $ 
+\end{itemize} 
+prevede la seguente regione critica, con $ c \ge 0 $:
+
+\[ C = \{ \underline{x} \in \mathbb{R} : M \ge c \} \]
+
+\begin{enumerate}
+\item Si determini la funzione potenza del test;
+\item Si determini il valore di $ c $ in corrispondenza di cui il test ha un livello di significativit\`a $ \alpha = 0.05 $;
+\item Si determini $ n $ in modo che il test con valore di $ c $ determinato al punto precedente abbia potenza (circa) $ 0.98 $ per $ \theta = \frac{3}{4} $;
+\item Calcolare il $ p $-value nel caso in cui $ n = 20, M = 0.48, H_{0} : \theta = \frac{1}{2} $. Con tali valori si pu\`o accettare $ H_{0} $ a livello $ \alpha = 0.05 $?
+\end{enumerate}
+\end{ex}
+
+\begin{proof}
+\noindent
+\begin{enumerate}
+\item $ k(\theta) = \mathbb{P}_{\theta} (\underline{X} \in C) = \mathbb{P}_{\theta} (M \ge c) = 1 - \mathbb{P}_{\theta} (M < c) = 1 - \prod\limits_{i = 1}^{n} \mathbb{P}_{\theta} (X_{i} < c) = \begin{cases} 1 - \left( \frac{c}{\theta} \right)^{n} & c \in (0, \theta) \\ 0 & c > \theta \end{cases} $
+\item Il test \`e del tipo composto vs. composto. Quindi $ \sup\limits_{\theta \in \mathcal{H}_{0}} \mathbb{P}_{\theta} (\underline{X} \in C) = \sup\limits_{0 < \theta \le \frac{1}{2}} \mathbb{P}_{\theta} \left( \underbrace{1 - \left( \frac{c}{\theta} \right)^{n}}_{g(\theta)} \right) $.
+
+Derivando $ g $ rispetto a $ \theta $ si ottiene  che $ g'(\theta) = n \frac{c^{n}}{\theta^{n + 1}} > 0, \forall\ c > 0, 0 < \theta \le \frac{1}{2} $, quindi $ \alpha = 1 - (2c)^{n} \implies 0.05 = 1 - (2c)^{n} \implies c = \frac{(0.95)^{\frac{1}{n}}}{2} $
+\item $ 0.98 = k \left( \frac{3}{4} \right) = 1 - \frac{0.95}{2^{n}} \left( \frac{4}{3} \right)^{n} = 1 - 0.95 \left( \frac{2}{3} \right)^{n} \implies \left( \frac{2}{3} \right)^{n} = \frac{0.02}{0.95} \implies n = \frac{\log \frac{0.02}{0.95}}{\log \frac{2}{3}} = 9.5217 \implies n = 10 \implies c = \frac{(0.95)^{\frac{1}{10}}}{2} = 0.497 < \frac{3}{4} $, ok.
+\item \noindent
+\begin{enumerate}
+\item Siano $ X_{1}, \dotsc, X_{n} \sim N(\theta, \sigma^{2}) $ e le ipotesi
+\begin{itemize}
+\item $ H_{0}: \theta = \theta_{0} $
+\item $ H_{1}: \theta > \theta_{0} $
+\end{itemize}
+
+Rigetto $ H_{0} $ se $ \hat{\theta} = \overline{X}_{n} > c $
+
+% TODO: grafico
+
+Se $ T $ \`e la statistica su cui si basa il test, ovvero su cui si construisce la regione critica, e $ t $ \`e la realizzazione di $ T $, se il criterio \`e "rigetto $ H_{0} $ se $ T > c $ allora il $ p $-value \`e dato da $ \mathbb{P}_{H_{0}} (T > t) $, se $ T < c $ allora il $ p $-value \`e dato da $ \mathbb{P}_{H_{0}} (T < t) $ mentre se $ \vert T \vert > c $ allora il $ p $-value \`e dato da $ \mathbb{P}_{H_{0}} (\vert T \vert > t) $.
+Quindi il $ p $-value \`e il massimo valore di $ \alpha $ per cui accetto $ H_{0} $ o il minore valore di $ \alpha $ per cui rigetto $ H_{0} $.
+
+\item Il $ p $-value corrispondente \`e dato da $ \mathbb{P} (M \ge 0.48 \vert H_{0} \text{ vera}) = 1 - \left( \frac{0.48}{\frac{1}{2}} \right)^{20} = 0.558 > 0.05 = \alpha \implies $ accetto $ H_{0} $, dato che si rigetta $ H_{0} $ se il $ p $-value \`e inferiore a $ \alpha $.
+
+% TODO: Grafico incomprensibile
+
+$ c = \frac{(0.95)^{\frac{1}{20}}}{2} = 0.498 < 0.48 = M $ quindi accetto $ H_{0} $
+\end{enumerate}
+\end{enumerate}
+\end{proof}
+
+\begin{ex}
+Sia $ X_{1}, \dotsc, X_{n} $ un campione i.i.d. $ \sim Po(\lambda) $.
+\begin{enumerate}
+\item Determinare un test MP per verificare
+\begin{itemize}
+\item $ H_{0} : \lambda = 2 $
+\item $ H_{1} : \lambda = 5 $
+\end{itemize}
+a livello $ \alpha = 0.1 $.
+\end{enumerate}
+\end{ex}
+
+\begin{proof}
+\noindent
+\begin{enumerate}
+\item Dato che $ \mathbb{E}[X_{i}] = \var_{\theta} (X_{i}) = \lambda $, stimo $ \lambda $ con $ \overline{X}_{n} = \frac{1}{n} \sum\limits_{i = 1}^{n} X_{i} \sim AN \left( \lambda, \frac{\lambda}{n} \right) \stackrel{H_{0}}{\sim} AN \left( 2, \frac{2}{100} \right) $
+
+$ C = \left\{ \underline{x} \in \mathbb{R}^{100} : \overline{X}_{n} > c \right\} $ e dato che \`e un test a livello $ \alpha $, si ha $ 0.1 = \mathbb{P}_{H_{0}} (\overline{X}_{n} > c) \approx \mathbb{P}_{H_{0}} \left( \underbrace{\frac{\overline{X}_{n} - 2}{\sqrt{\frac{2}{100}}}}_{\simeq N(0,1)} > \underbrace{\frac{c - 2}{\sqrt{\frac{2}{100}}}}_{c_{1}} \right) = \mathbb{P}_{H_{0}} (N(0,1) > c_{1}) \implies F_{N(0,1)} (c_{1}) = 0.9 \implies c_{1} = 1.29 \implies c = 1.29 \sqrt{\frac{2}{100}} + 2 = 2.182 $ quindi $ C = \left\{ \underline{x} \in \mathbb{R}^{100} : \overline{X}_{n} > 2.182 \right\} $ \`e la migliore regione critica se $ \exists\ k > 0 : $
+\begin{itemize}
+\item $ \frac{L(2)}{L(5)} \le k, \forall\ \underline{x} \in C $
+\item $ \frac{L(2)}{L(5)} > k, \forall\ \underline{x} \in \compl{C} $
+\end{itemize}
+
+Quindi $ \frac{L(2)}{L(5)} = \left( \frac{2}{5} \right)^{\sum\limits_{i = 1}^{n} X_{i}} e^{n(5 - 2)} \le k \iff \overline{X}_{n} \ge \frac{3 - \frac{\log k}{100}}{\log \frac{5}{2}} = c = 2.182 $.
+
+$ \log k = 100 \left(3 - 2.182 \log \frac{5}{2} \right) = 100.06 \implies k = e^{100.06} > 0 $
+\end{enumerate}
+\end{proof}
+
+\section{Esercitazione del 3 novembre 2017}
+\begin{ex}
+Siano $ X_{1}, \dotsc, X_{n} \sim N(\mu, 64) $ i.i.d..
+\begin{enumerate}
+\item Mostrare che $ C = \{ \underline{x} \in \mathbb{R}^{n} : \overline{X}_{n} \le x \} $ \`e una miglior regione critica per testare
+\begin{itemize}
+\item $ H_{0}: \mu = 80 $
+\item $ H_{1}: \mu = 76 $
+\end{itemize}
+a livello $ \alpha $
+\item Indicata con $ \alpha = \mathbb{P} (\text{errore del primo tipo}) $ e $ \beta = \mathbb{P} (\text{errore del secondo tipo}) $ trovare $ n $ e $ c $ tali che $ \alpha = \beta = 0.05 $ (approssimativamente)
+\end{enumerate}
+\end{ex}
+
+\begin{proof}
+\noindent
+\begin{enumerate}
+\item Dato che i dati sono normali, $ \frac{L(\underline{x}, 80)}{L(\underline{x}, 76)} = \left( \frac{\frac{1}{\sqrt{2 \pi 64}}}{\frac{1}{2 \pi 64}} \right)^{n} \frac{e^{-\frac{1}{128} \sum\limits_{i = 1}^{n} (X_{i} - 80)^{2}}}{e^{-\frac{1}{128} \sum\limits_{i = 1}^{n} (X_{i} - 76)^{2}}} = \frac{e^{-\frac{1}{128} \sum\limits_{i = 1}^{n} (X_{i}^{2} + 6400 - 60 X_{i})}}{e^{-\frac{1}{128} \sum\limits_{i = 1}^{n} (X_{i}^{2} + 5776 - 152 X_{i})}} = \exp \left( \frac{8}{128} \sum\limits_{i = 1}^{n} X_{i} - \frac{624}{128}n \right) \le k \implies \frac{1}{n} \left( \frac{1}{16} \sum\limits_{i = 1}^{n} X_{i} - \frac{78}{16} n \right) \le \frac{\log k}{n} \implies \overline{X}_{n} \le \frac{16}{n} \log k + 78 \eqdef c \implies k = \exp \left( (c - 78) \frac{n}{16} \right) > 0, \forall\ c, n \implies \exists\ k > 0 : \begin{cases}
+\forall\ \underline{x} \in C, \frac{L(80)}{L(76)} \le k \\
+\forall\ \underline{x} \in \compl{C}, \frac{L(80)}{L(76)} > k
+\end{cases} $
+\item $ \begin{cases}
+\mathbb{P} (\overline{X}_{n} \le c \vert \mu = 80) = 0.05 \\
+\mathbb{P} (\overline{X}_{n} > c \vert \mu = 76) = 0.05
+\end{cases} \implies \begin{cases}
+\mathbb{P} (\frac{\overline{X}_{n} - 80}{\sqrt{\frac{64}{n}}} \le \underbrace{\frac{c - 80}{\sqrt{\frac{64}{n}}}}_{d_{1}} \vert \mu = 80) = 0.05 \\
+\mathbb{P} (\frac{\overline{X}_{n} - 80}{\sqrt{\frac{64}{n}}} > \overbrace{\frac{c - 80}{\sqrt{\frac{64}{n}}}}^{d_{2}} \vert \mu = 76) = 0.05
+\end{cases} \implies \begin{cases} 
+F_{N(0,1)} (d_{1}) = 0.05 \\
+1 - F_{N(0,1)} (d_{2}) = 0.05
+\end{cases} \implies \begin{cases} 
+F_{N(0,1)} (-d_{1}) = 0.95 \\
+F_{N(0,1)} (d_{2}) = 0.95
+\end{cases} \implies \begin{cases} 
+d_{1} = -1.64 \\
+d_{2} = 1.64
+\end{cases} $. Sostituendo i valori trovati nella definizione di $ d_{1} $ e $ d_{2} $ si ottiene che $ \begin{cases} 
+c = 78 \\
+n = \left( \frac{26.31}{4} \right)^{2} = 43.29 \stackrel{n \in \mathbb{N}}{\leadsto} 43
+\end{cases}$
+\end{enumerate}
+\end{proof}
+
+\begin{ex}
+Siano $ X_{1}, \dotsc, X_{n} $ i.i.d. con pdf $ f_{\theta} (x) = \begin{cases} \theta x^{\theta - 1} & 0 < x < 1 \\ 0 & \text{altrove} \end{cases} $ con $ \theta > 0 $.
+\begin{enumerate}
+\item Calcolare lo stimatore ML di $ \theta $;
+\item Utilizzare lo stimatore ML trovato nel primo punto per verificare
+\begin{itemize}
+\item $ H_{0} : \theta = \theta_{0} $
+\item $ H_{1} : \theta > \theta_{0} $
+\end{itemize}
+\item Il test trovato \`e UMP?
+\end{enumerate}
+\end{ex}
+
+\begin{proof}
+\noindent
+\begin{enumerate}
+\item $ L(\underline{x}, \theta) = \theta^{n} \left( \prod\limits_{i = 1}^{n} x_{i} \right)^{\theta - 1} $ con $ x_{i} \in (0,1) $. Passando ai logaritmi si ottiene $ \log L = n \log \theta + (\theta - 1) \sum\limits_{i = 1}^{n} \log (x_{i}) $. Derivando rispetto a $ \theta $ si ottiene $ \frac{\mathrm{d}}{\mathrm{d} \theta} \log L = \frac{n}{\theta} + \sum\limits_{i = 1}^{n} \log x_{i} = 0 \implies \theta = \frac{n}{\sum\limits_{i = 1}^{n} \log \left( \frac{1}{x_{i}} \right)} $ \`e candidato stimatore ML. Derivando ancora si ottiene $ \frac{\mathrm{d}^{2}}{\mathrm{d} \theta^{2}} \log L = - \frac{n}{\theta^{2}} < 0, \forall\ \theta > 0 \implies \theta = \frac{n}{\sum\limits_{i = 1}^{n} \log \left( \frac{1}{x_{i}} \right)} $ \`e massimo;
+\item $ C = \{ \underline{x} \in \mathbb{R}^{n} \vert \ML{\theta} > c \} $. Impongo $ \alpha = \mathbb{P}(\ML{\theta} > c \vert H_{0}) = \mathbb{P} _{\theta_{0}} \left( \frac{n}{\sum\limits_{i = 1}^{n} \log \left( \underbrace{\frac{1}{x_{i}}}_{> 0, \forall\ i} \right)} > c \right) = \mathbb{P}_{\theta_{0}} \left( \sum\limits_{i = 1}^{n} \log \frac{1}{x_{i}} < \frac{n}{c} \right) = (\ast) $. Si definisca $ Y = \log \frac{1}{X} $ con $ X \sim f_{\theta} $. $ F_{Y}(y) = \mathbb{P} (Y \le y) = \mathbb{P} \left( \log \frac{1}{x} \le y \right) = \mathbb{P} \left( \frac{1}{x} \le e^{y} \right) = \mathbb{P} (X \ge e^{-y}) = \int\limits_{e^{-y}}^{1} \theta x^{\theta - 1} \, \mathrm{d}x = [x^{\theta}]^{1}_{e^{-y}} = 1 - e^{-\theta y} $ quindi $ f_{Y}(y) = F_{Y}' (y) = \theta e^{- \theta y} $. 
+
+$ Y \sim \text{Esp} (\theta) \implies \sum\limits_{i = 1}^{n} \log \frac{1}{X_{i}} \sim \Gamma (n, \theta) $ e quindi $ (\ast) = F_{\Gamma(n, \theta_{0})} \left( \frac{n}{c} \right) \implies c = \frac{n}{c_{\Gamma(n, \theta_{0}); \alpha}} $
+\item $ f_{\theta}(x) = \theta x^{\theta - 1} \mathbbm{1}_{[0,1]} (x) = \underbrace{\theta}_{C(\theta)} e^{\underbrace{-(\theta - 1)}_{Q(\theta)} \underbrace{\log \frac{1}{x}}_{T(x)}} \underbrace{\mathbbm{1}_{[0,1]} (x)}_{h(x)} \implies Q(\theta) = 1 - \theta $ \`e una funzione monotona decrescente e quindi vlae la propriet\`a MLR in $ - V(\underline{x}) = - \sum\limits_{i = 1}^{n} \log \frac{1}{x_{i}} $. Il test UMP \`e dato da
+
+\[ \phi(\underline{x}) = \begin{cases}
+1 & -V(\underline{x}) > c \\
+0 & \text{altrimenti}
+\end{cases} \implies \begin{cases}
+1 & \sum\limits_{i = 1}^{n} \log \frac{1}{x_{i}} < c_{1} \\	% Perché c_1 e non solo c?
+0 & \text{altrimenti}
+\end{cases} \]
+
+con $ \mathbb{P}_{\theta_{0}} \left( \sum\limits_{i = 1}^{n} \log \frac{1}{x_{i}} < c_{1} \right) = \alpha $
+\end{enumerate}
+\end{proof}
+
+\begin{ex}
+Sulla base di un campione di taglia $ 1 $ per $ X \sim f_{\theta} (x) = \frac{1}{\pi (1 + (x - \theta)^{2}} $, con $ x, \theta \in \mathbb{R} $. Verificare
+\begin{itemize}
+\item $ H_{0}: \theta = 0 $
+\item $ H_{1}: \theta \ne 0 $
+\end{itemize}
+a livello $ \alpha $
+\end{ex}
+
+\begin{proof}
+Sotto $ H_{0} $, $ L (\underline{x}, \theta) = \frac{1}{\pi (1 + x^{2})} $. Sotto $ \mathcal{H} $, $ L(\underline{x}, \theta) $ \`e massimo in $ x = \theta $.
+
+\[ \lambda = \frac{\frac{1}{\cancel{\pi} (1 + x^{2})}}{\frac{1}{\cancel{\pi}}} = \frac{1}{1 + x^{2}} \]
+
+Rigetto $ H_{0} $ se $ \lambda < k \iff \frac{1}{1 + x^{2}} < k \iff x^{2} > \frac{1}{k} - 1 \iff x < -c \lor x > c $ con $ c = \sqrt{1 - \frac{1}{k}} $. Di conseguenza, $ C = \{ x \in \mathbb{R} : x < -c \lor x > c \} $ con $ \alpha = \mathbb{P}_{\theta = 0} (x < -c \lor x > c) = 2 \mathbb{P}_{\theta = 0} (x > c) = 2 \int\limits_{c}^{+\infty} \frac{1}{\pi} \frac{1}{1 + x^{2}} \, \mathrm{d}x \stackrel{\footnotemark[1]}{=} \frac{2}{\pi} \int\limits_{\arctan(c)}^{\frac{\pi}{2}} \, \mathrm{d}t = \frac{2}{\pi} \left( \frac{\pi}{2} - \arctan(x) \right) \implies c = \tan \left( \frac{\pi (1 - \alpha)}{2} \right) \implies C= \left\{ x \in \mathbb{R} : x < - \tan \left( \frac{\pi (1 - \alpha)}{2} \right) \lor x > \tan \left( \frac{\pi (1 - \alpha)}{2} \right) \right\} $
+\footnotetext[1]{$ 1 + x^{2} = 1 + \frac{\sin^{2} t}{\cos^{2} t} = \frac{1}{cos^{2} t} \implies \mathrm{d}x = \frac{1}{\cos^{2} t} \mathrm{d}t $}
+
+\end{proof}
+
+\begin{thm}
+Siano $ X_{1}, \dotsc, X_{n} $ variabili aleatorie i.i.d. con pdf $ f(x, \theta) $ appartenente alla famiglia esponenziale. Sia $ Q(\theta) $ monotona crescente e $ \theta \in \Theta \subseteq \mathbb{R} $. Sia $ V(\underline{X}) = \sum\limits_{i = 1}^{n} T(X_{i}) $. 
+
+Per testare 
+\begin{itemize}
+\item $ H_{0}: \theta \le \theta_{1} \lor \theta \ge \theta_{2} $
+\item $ H_{1}: \theta_{1} < \theta < \theta_{2} $
+\end{itemize}
+
+a livello $ \alpha $ esiste un test UMP dato da
+
+\[ \phi(\underline{X}) = \begin{cases} 1 & c_{1} < V(\underline{X}) < c_{2} \\ 0 & \text{altrimenti} \end{cases} \]
+
+con $ \mathbb{P}_{\theta_{1}} (c_{1} < V(\underline{X}) < c_{2}) = \mathbb{P}_{\theta_{2}} (c_{1} < V(\underline{X}) < c_{2}) = \alpha $.
+
+Se $ Q(\theta) $ \`e monotona decrescente si invertono le disuguaglianze.
+\end{thm}
+
+\begin{ex}
+Siano $ X_{1}, \dotsc, X_{n} \sim N(\theta, \sigma^{2}) $ i.i.d. con $ \sigma^{2} $ nota.
+\begin{enumerate}
+\item Trovare un test UMP per verificare
+\begin{itemize}
+\item $ H_{0}: \theta \le \theta_{1} \lor \theta \ge \theta_{2} $
+\item $ H_{1}: \theta_{1} < \theta < \theta_{2} $
+\end{itemize}
+
+a livello $ \alpha = 0.01 $ con $ n = 25, \theta_{1} = 1, \theta_{3} = 3 $ e $ \sigma^{2} = 1 $
+\item Calcolare la funzione potenza del test.
+\end{enumerate}
+\end{ex}
+
+\begin{proof}
+\noindent
+\begin{enumerate}
+\item $ f(x, \theta) = \underbrace{\frac{1}{\sqrt{2\pi}} e^{- \frac{\theta^{2}}{2}}}_{C(\theta)} e^{x \theta} \underbrace{e^{-\frac{x^{2}}{2}}}_{h(x)} $
+
+$ Q(\theta) = \theta $ e $ T(x) = x $ quindi $ V(\underline{x}) = \sum\limits_{i = 1}^{n} x_{i} $
+
+La regione critica \`e data da $ C = \{ \underline{x} \in \mathbb{R}^{n} : c_{1} < \sum\limits_{i = 1}^{n} X_{i} < c_{2} \} $ con $ \begin{cases} 
+\mathbb{P} (c_{1} \le \sum\limits_{i = 1}^{n} X_{i} \le c_{2} \vert \theta = 1) = 0.01 \\
+\mathbb{P} (c_{1} \le \sum\limits_{i = 1}^{n} X_{i} \le c_{2} \vert \theta = 3) = 0.01
+\end{cases} $
+
+$ \sum\limits_{i = 1}^{n} X_{i} \sim N(25 \theta, 25) = \begin{cases}
+N(25, 25) & \theta = 1 \\
+N(75, 75) & \theta = 3
+\end{cases} \implies c_{2} - 50 = 50 - c_{1} \implies c_{1} + c_{2} = 100 $ 
+
+Quindi $ 0.01 = \mathbb{P} (c_{1} \le \sum\limits_{i = 1}^{n} X_{i} \le c_{2} \vert \theta = 1) = \mathbb{P} \left( \underbrace{\frac{c_{1} - 25}{5}}_{d_{1}} \le \underbrace{\frac{\sum\limits_{i = 1}^{n} X_{i} - 25}{5}}_{\sim N(0,1)} \le \underbrace{\frac{c_{2} - 25}{5}}_{d_{2}} \right) \implies F_{N(0,1)} (d_{2}) - F_{N(0,1)} (d_{1}) = 0.01 $ e $ d_{1}, d_{2} $ simmetrici rispetto a $ 5 $.
+
+Sulle tavole risulta che $ F_{N(0,1)} (x) \approx 1 $ per $ x > 4 $ quindi $ F_{N(0,1)} (d_{1}) = 1 - \alpha = 0.99 \implies d_{1} = 2.33 \implies c_{1} = 36.65 $ mentre $ c_{2} = 100 - c_{1} = 63.35 $.
+\item Da fare
+\end{enumerate}
+\end{proof}
+
+\section{Esercitazione del 6 novembre 2017}
+\begin{defn}
+Siano $ X_{1}, \dotsc, X_{n} $ variabili aleatorie con funzione di verosimiglianza $ L(\underline{x}, \underline{\theta}) $ con $ \theta \in \Theta \subseteq \mathbb{R}^{k} $ e sia $ \mathcal{H}_{0} \subseteq \Theta $. Un test $ \phi $ per verificare
+\begin{itemize}
+\item $ H_{0} : \underline{\theta} \in \mathcal{H}_{0} $
+\item $ H_{1} : \underline{\theta} \in \compl{\mathcal{H}_{0}} $
+\end{itemize}
+
+a livello $ \alpha $ \`e detto non distorto o corretto se:
+\begin{itemize}
+\item $ \mathbb{P}_{\theta} (\phi(\underline{X}) = 1) = k(\theta) \le \alpha, \forall\ \underline{\theta} \in \mathcal{H}_{0} $ (condizione di soglia)
+\item $ \mathbb{P}_{\theta} (\phi(\underline{X}) = 1) = k(\theta) \ge \alpha, \forall\ \underline{\theta} \in \compl{\mathcal{H}_{0}} $ (condizione di correttezza)
+\end{itemize}
+\end{defn}
+
+\begin{defn}
+Un test \`e detto UMPU (\emph{Uniformly more powerful unbiased}) se \`e UMP nella classe dei test non distorti.
+\end{defn}
+
+\begin{oss}
+UMP $ \implies $ UMPU ma UMPU $ \cancel{\implies} $ UMP.
+\end{oss}
+
+\begin{thm}
+Siano $ X_{1}, \dotsc, X_{n} $ variabili aleatorie con $ f(x, \theta) = C(\theta) e^{Q(\theta) T(\underline{X})} h(\underline{X}) $, con $ \theta \in \Theta \subseteq \mathbb{R} $. Sia $ Q(\theta) $ monotona crescente. Allora esiste un test UMPU di livello $ \alpha $ per testare
+\begin{itemize}
+\item $ H_{0}: \theta_{1} \le \theta \le \theta_{2} $
+\item $ H_{1}: \theta < \theta_{1} \lor \theta > \theta_{2} $
+\end{itemize}
+
+oppure
+
+\begin{itemize}
+\item $ H_{0}': \theta = \theta_{0} $
+\item $ H_{1}': \theta \ne \theta_{0} $
+\end{itemize}
+
+dato da
+
+\[ \phi (\underline{X}) = \begin{cases}
+1 & V(\underline{X}) < c_{1} \lor V(\underline{X}) > c_{2} \\
+0 & \text{altrimenti}
+\end{cases} \]
+
+dove $ V(\underline{X}) = \sum\limits_{i = 1}^{n} T(X_{i}) $ con i vincoli:
+\begin{itemize}
+\item per $ H_{0} $ e $ H_{1} $:
+\begin{itemize}
+\item $ \mathbb{P}_{\theta_{1}} (V(\underline{X}) < c_{1} \lor V(\underline{X}) > c_{2}) = \mathbb{P}_{\theta_{2}} (V(\underline{X}) < c_{1} \lor V(\underline{X}) > c_{2}) = \alpha $ (condizione di soglia)
+\item $ \mathbb{P}_{\theta} (V(\underline{X}) < c_{1} \lor V(\underline{X}) > c_{2}) \ge \alpha, \forall\ \theta < \theta_{1} \lor \theta > \theta_{2} $ (condizione di correttezza)
+\end{itemize}
+\item per $ H_{0}' $ e $ H_{1}' $:
+\begin{itemize}
+\item $ \mathbb{P}_{\theta_{0}} (V(\underline{X}) < c_{1} \lor V(\underline{X}) > c_{2}) = \alpha $ (condizione di soglia)
+\item $ \mathbb{P}_{\theta_{0}} (V(\underline{X}) < c_{1} \lor V(\underline{X}) > c_{2}) \ge \alpha, \forall\ \theta \ne \theta_{0} $ (condizione di correttezza)
+\end{itemize}
+\end{itemize}
+\end{thm}
+
+\begin{ex}
+Siano $ X_{1}, \dotsc, X_{n} \sim N(\theta, 4) $ i.i.d.. Si trovi un test UMPU per verificare 
+\begin{itemize}
+\item $ H_{0}: \theta = \theta_{0} $
+\item $ H_{1}: \theta \ne \theta_{0} $
+\end{itemize}
+\end{ex}
+
+\begin{proof}
+La normale appartiene alla famiglia esponenziale quando il parametro incognito \`e la media (vale anche per la varianza) con $ T(X) = X $ e quindi $ V(\underline{X}) = \sum\limits_{i = 1}^{n} X_{i} $. Il test UMPU avr\`a quindi una regione critica definita da $ C = \{ \underline{x} \in \mathbb{R}^{n} : \sum\limits_{i = 1}^{n} X_{i} \le c_{1} \lor \sum\limits_{i = 1}^{n} X_{i} \ge c_{2} \} $
+
+La funzione potenza \`e $ k(\theta) = \mathbb{P}_{\theta} (\underline{x} \in C) = 1 - \mathbb{P}_{\theta} (c_{1} < \underbrace{\sum\limits_{i = 1}^{n} X_{i}}_{\sim N(n\theta, 4n)} < c_{2}) $. Standardizzando si ottiene $ 1 - \mathbb{P}_{\theta} \left[ \frac{c_{1} - n\theta}{2 \sqrt{n}} < N(0,1) < \frac{c_{2} - n\theta}{2 \sqrt{n}} \right] = 1 - \frac{1}{\sqrt{2 \pi}} \int\limits_{\frac{c_{1} - n\theta}{2 \sqrt{n}}}^{\frac{c_{2} - n\theta}{2 \sqrt{n}}} e^{-\frac{t^{2}}{2}} \, \mathrm{d}t $
+
+Considerando i vincoli di soglia ($ k(\theta_{0}) = \alpha $) e di correttezza ($ k(\theta_{0}) \le k(\theta), \forall\ \theta \ne \theta_{0} $), si ha che $ k(\theta) $ ha un minimo in $ \theta_{0} $ e vale $ \alpha $ in tale punto $ \implies \frac{\mathrm{d}}{\mathrm{d} t} k(\theta)_{\big\vert_{\theta = \theta_{0}}} = 0 $, quindi
+
+$ \frac{\sqrt{n}}{2 \sqrt{2 \pi}} \left[ \exp \left( - \frac{(c_{2} - n \theta_{0})^{2}}{8n} \right) - \exp \left( -\frac{(c_{1} - n\theta_{0})^{2}}{8n} \right) \right] = 0 \implies \vert c_{2} - n\theta_{0} = \vert c_{1} - n \theta_{0} \vert \eqdef a $, da cui $ \begin{cases} c_{1} = n \theta_{0} - a \\ c_{2} = n \theta_{0} + a \end{cases} $
+
+La regione critica diventa quindi $ C = \{ \underline{x} \in \mathbb{R}^{n} : \sum\limits_{i = 1}^{n} x_{i} \le n \theta_{0} - a \lor \sum\limits_{i = 1}^{n} x_{i} \ge n \theta_{0} + a \} = \{ \underline{x} \in \mathbb{R}^{n} : \overline{X}_{n} \le \theta_{0} - \frac{a}{n} \lor \overline{X}_{n} \ge \theta_{0} + \frac{a}{n} \} $.
+
+Imponendo la condizione di soglia, ovvero che $ \alpha = \mathbb{P}_{\theta_{0}} (\underline{x} \in C) = 1 - \mathbb{P}_{\theta_{0}} (n \theta_{0} - a < \underbrace{\sum\limits_{i = 1}^{n} X_{i}}_{\stackrel{H_{0}}{\sim} N(n \theta_{0}, 4n)} < n \theta_{0} + a) = 1 - \mathbb{P}_{\theta_{0}} \left( \underbrace{-\frac{a}{2 \sqrt{n}}}_{-c} \le N(0,1) \le \underbrace{\frac{a}{2 \sqrt{n}}}_{c} \right) = 1 - \alpha $
+
+$ c = c_{1 - \frac{\alpha}{2}} \implies a = 2 \sqrt{n} c_{1 - \frac{\alpha}{2}} \implies C = \{ \underline{x} \in \mathbb{R}^{n} : \overline{X}_{n} \le \theta_{0} - c_{1 - \frac{\alpha}{2}} \frac{2}{\sqrt{n}} \lor \overline{X}_{n} \ge \theta_{0} + c_{1 - \frac{\alpha}{2}} \frac{2}{\sqrt{n}} \} $
+\end{proof}
+
+\begin{ex}
+Sia $ X \sim f(x, \theta) = \theta x^{\theta - 1} $ con $ \theta > 0 $ e $ x \in [0, 1] $.
+\begin{enumerate}
+\item Trovare un test UMPU per verificare
+\begin{itemize}
+\item $ H_{0}: \theta = 1 $
+\item $ H_{0}: \theta \ne 1 $
+\end{itemize}
+con $ \alpha = 0.1 $, basandosi su una sola osservazione;
+\item Utilizzando un campione di dimensione $ n $ e i.i.d., si trovi il test basato sul rapporto ML con lo stesso livello di significativit\`a per verificare le ipotesi del punto precedente.
+\end{enumerate}
+\end{ex}
+
+\begin{proof}
+\noindent
+\begin{enumerate}
+\item $ f $ appartiene alla famiglia esponenziale. Infatti $ f (x, \theta) = \theta e^{(\theta - 1) \log x} \mathbbm{1}_{[0,1]} (x) $. $ Q(\theta) = \theta - 1 $ \`e monotona crescente, $ T(x) = \log x $, quindi $ V(\underline{X}) = \sum\limits_{i = 1}^{n} \log X_{i} = \log X $, essendo $ n = 1 $. Il test UMPU usa la seguente regione critica: $ C = \{ x \in \mathbb{R} : \log x < \tilde{c}_{1} \lor \log x > \tilde{c}_{2} \} = \{ x \in \mathbb{R} : x < c_{1} \lor x > c_{2} \} $, con i seguenti vincoli:
+\begin{enumerate}
+\item $ \mathbb{P} (X \in C \vert \theta  = 1) = \alpha = 0.1 $ (condizione di soglia)
+\item $ \mathbb{P} (X \in C \vert \theta  = \theta_{0}) \ge \alpha = 0.1, \forall\ \theta_{0} \ne 1 $ (condizione di correttezza)
+\end{enumerate}
+
+La funzione potenza \`e $ k(\theta) = \mathbb{P}_{\theta} (X \in C) = \int\limits_{0}^{c_{1}} \theta x^{\theta - 1} \, \mathrm{d}x + \int\limits_{c_{2}}^{1} \theta x^{\theta - 1} \, \mathrm{d}x = c_{1}^{\theta} + 1 - c_{2}^{\theta} $. Si impostano i vincoli:
+\begin{enumerate}
+\item $ c_{1}  + 1 - c_{2} = 0.1 $
+\item Il punto $ \theta  = 1 $ deve essere un minimo per $ k(\theta) $, quindi $ k(\theta) = c_{1}^{\theta} + 1 - c_{2}^{\theta} = e^{\theta \log c_{1}} + 1 - e^{\theta \log c_{2}} \implies k'(\theta) = e^{\theta \log c_{1}} \log c_{1} - e^{\theta \log c_{2}} \log c_{2} = c_{1}^{\theta} \log c_{1} - c_{2}^{\theta} \log c_{2} $. Per essere un estremante deve essere $ k'(1) = 0 \iff c_{1} \log c_{1} = c_{2} \log c_{2} $. Si verifichi ora che $ \theta = 1 $ \`e minimo per $ k(\theta) $: tenendo conto che $ c_{1}, c_{2} \in [0,1] $ (e quindi $ \log c_{1} < 0 $) e che $ c_{1} < c_{2} $, $ k'(\theta) \ge 0 \iff c_{1}^{\theta} \log c_{1} \ge c_{2}^{\theta} \log c_{2} \iff \left( \frac{c_{1}}{c_{2}} \right)^{\theta} \le \frac{\log c_{2}}{\log c_{1}} \iff \theta \ge \frac{\log \left( \frac{\log c_{2}}{\log c_{1}} \right)}{\log \left( \frac{c_{1}}{c_{2}} \right)} \eqdef \tilde{\theta} \implies \tilde{\theta} = 1 $ \`e un punto di minimo.
+\end{enumerate}
+
+$ \implies \begin{cases}
+c_{1} \log c_{1} = c_{2} \log c_{2} \\
+c_{1} + 1 - c_{2} = 0.01
+\end{cases} \implies \begin{cases}
+c_{1} = c_{2} - 0.9 \\
+(c_{2} - 0.9) \log (c_{2} - 0.9) - c_{2} \log c_{2} = h(c_{2}) = 0
+\end{cases} $
+
+Una soluzione approssimata per $ h(c_{2}) = 0 $ \`e data da $ c_{2} = 0.9196 $, quindi $ c_{1} = c_{2} - 0.9 = 0.0196 $ e quindi $ C = \{ x \in \mathbb{R} : x < 0.0196 \lor x > 0.9196 \} $
+\item $ L (\underline{x}, \theta) = \theta^{n} e^{(\theta - 1) \sum\limits_{i = 1}^{n} \log x_{i}} $ con $ x_{i} \in [0,1] $. Derivando rispetto a $ \theta $ si ottiene che$ \frac{\mathrm{d}}{\mathrm{d} \theta} \log L = \frac{\mathrm{d}}{\mathrm{d} \theta} (n \log \theta + (\theta - 1) \sum\limits_{i = 1}^{n} \log x_{i}) = \frac{n}{\theta} + \sum\limits_{i = 1}^{n} \log x_{i} = 0 $ Derivando ancora si ottiene che $ \frac{\mathrm{d}^{2}}{\mathrm{d} \theta^{2}} \log L = - \frac{n}{\theta^{2}} < 0 \implies \ML{\theta} = - \frac{n}{\sum\limits_{i = 1}^{n} \log x_{i}} $
+
+Sia $ Z_{n} \defeq \sum\limits_{i = 1}^{n} \log x_{1} $. $ \lambda (\underline{x}) = \frac{L(\underline{x}, 1)}{\max\limits_{\theta \in \Theta} L(\underline{x}, \theta)} = \frac{L(\underline{x}, 1)}{L(\underline{x}, \ML{\theta})} = \frac{1}{\left( -\frac{n}{Z_{n}} \right)^{n} e^{(-\frac{n}{Z_{n}} - 1) Z_{n}}} = \left( -\frac{n}{Z_{n}} \right)^{n} e^{Z_{n} + n} $
+
+Rigetto quindi $ H_{0} $ se $ \lambda(\underline{x}) < \lambda_{0} $, ovvero se $ \left( -\frac{n}{Z_{n}} \right)^{n} e^{Z_{n} + n} < \lambda_{0} $, con $ {\mathbb{P} \left( \left( -\frac{n}{Z_{n}} \right)^{n} e^{Z_{n} + n} < \lambda_{0} \vert H_{0} \text{ vera} \right) = \alpha} $. Se $ n $ grande si ha che:
+
+\[ - 2 \log \lambda(\underline{X}) \mathop{\to}^{d}_{H_{0}} \chi^{2}_{k} \]
+
+con $ k = \dim \mathcal{H} - \dim \mathcal{H}_{0} = \dim \mathbb{R}^{+} - \dim \{ \theta_{0} \} = 1 - 0 = 1 $, quindi $ 0.1 = \mathbb{P} (\lambda(\underline{X}) > \lambda_0 \vert H_0) = \mathbb{P} (-2 \log \lambda(\underline{X}) > \underbrace{- 2 \log \lambda_{0}}_{c} \vert H_0) = \mathbb{P}(\chi^{2}_{1} > c \vert H_{0}) $.
+
+Si ottiene che $ F_{\chi^{2}_{1}} (c) = 0.9 \implies c = 2.7 \implies \lambda_{0} = 0.26 $ e quindi la regione critica risulta essere $ C = \left\{ \underline{x} \in \mathbb{R}^{n} : \left( - \frac{Z_{n}}{n} \right)^{n} e^{Z_{n} + n} < 0.26 \right\} $
+\end{enumerate}
+\end{proof}
+
+\begin{thm}
+Sia $ X \sim \Gamma \left( \frac{r}{2}, \beta \right) $ una variabile aleatoria con $ r \in \mathbb{N} $ e $ \beta \in \mathbb{R}^{+} $ allora $ Y = \frac{2X}{\beta} \sim \chi^{2}_{r} $ 
+\end{thm}
+
+\begin{proof}
+Si risolve calcolando le pdf.
+\end{proof}
+
+\begin{ex}
+Siano $ X_{1} \sim \text{Esp} (\theta_{1}) $ e $ X_{2} \sim \text{Esp} (\theta_{2}) $ indipendenti. Impostare un test d'ipotesi per verificare
+\begin{itemize}
+\item $ H_{0}: \theta_{1} = \theta_{2} $
+\item $ H_{1}: \theta_{1} \ne \theta_{2} $
+\end{itemize}
+basato sulla statistica $ T = \frac{X_{1}}{X_{2}} $ supponendo di aver osservato una sola realizzazione di $ X_{1} $ e $ X_{2} $
+\end{ex}
+
+\begin{proof}
+$ \begin{cases}
+X_{1} = \text{Esp} (\theta_{1}) = \Gamma(1, \theta_{1}^{-1}) \\
+X_{2} = \text{Esp} (\theta_{2}) = \Gamma (1, \theta_{2}^{-1})
+\end{cases} \implies \begin{cases}
+2 \theta_{1} X_{1} \sim \chi^{2}_{2} \\
+2 \theta_{2} X_{2} \sim \chi^{2}_{2}
+\end{cases} $ indipendenti, quindi $ T \stackrel{H_{0}}{=} \frac{\frac{2 \tilde{\theta} X_{1}}{2}}{\frac{2 \tilde{\theta} X_{2}}{2}} = \frac{\frac{\chi^{2}_{2}}{2}}{\frac{\chi^{2}_{2}}{2}} \stackrel{H_{0}}{\sim} F_{2, 2} $
+
+Il test diventa:
+\begin{itemize}
+\item $ H_{0}: \frac{\theta_{1}}{\theta_{2}} = 1 $
+\item $ H_{1}: \frac{\theta_{1}}{\theta_{2}} \ne 1 $
+\end{itemize}
+
+e rigetto $ H_{0} $ se $ \vert T - 1 \vert > c $ con $ \mathbb{P}_{H_{0}} (\vert F_{2, 2} - 1 \vert > c) = \alpha $
+\end{proof}
+
+\section{10 nov 2017}
+\begin{ex}[Primo compitino del 2 maggio 2007]
+Un gruppo di bambini che alla nascita avevano lo stesso peso [...]
+
+\begin{center}
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c}
+\hline
+	Dieta $ A $ & 5 & 7 & 8 & 9 & 6 & 7 & 10 & 8 & 6 \\
+\hline
+	Dieta $ B $ & 9 & 10 & 8 & 6 & 8 & 7 & 9 & - & - \\
+\hline
+\end{tabular}
+\end{center}
+
+Siano $ X_{A} $ peso con dieta $ A \sim N $ e $ X_{B} $ peso con dieta $ B \sim N $. $ \alpha = 0.05 $
+\end{ex}
+
+\begin{proof}
+Avendo
+\begin{itemize}
+\item $ X_{A} \sim N (\mu_{A}, \sigma^{2}_{A}) $
+\item $ X_{B} \sim N (\mu_{B}, \sigma^{2}_{B}) $
+\end{itemize}
+
+si testi
+\begin{itemize}
+\item $ H_{0}: \mu_{A} = \mu_{B} $
+\item $ H_{1}: \mu_{A} \ne \mu_{B} $
+\end{itemize}
+
+ma prima bisogna fare un confronto di varianze, ovvero
+\begin{itemize}
+\item $ H_{0}': \sigma^{2}_{A} = \sigma^{2}_{B} $
+\item $ H_{1}': \sigma^{2}_{A} \ne \sigma^{2}_{B} \leadsto \sigma^{2}_{A} > \sigma^{2}_{B} $
+\end{itemize}
+
+$ S_{n}^{2} = \frac{1}{n - 1} \sum\limits_{i = 1}^{n} (X_{i} - \overline{X})^{2} $, quindi $ S^{2}_{A} = 2.5 $ e $ S^{2}_{B} = 1.81 $, per cui $ \overline{X}_{A} = 7.33 $ e $ \overline{X}_{B} = 8.14 $
+
+Sfruttando il fatto che $ \frac{n - 1}{\sigma^{2}} S^{2}_{n} \sim \chi^{2}_{n - 1} $ si ha che il nuovo test diventa
+\begin{itemize}
+\item $ H_{0}'': \frac{\sigma^{2}_{A}}{\sigma^{2}_{B}} = 1 $
+\item $ H_{1}'': \frac{\sigma^{2}_{A}}{\sigma^{2}_{B}} > 1 $
+\end{itemize}
+
+$ \mathcal{F} = \frac{S_{A}^{2}}{S_{B}^{2}} \stackrel{H_{0}}{\sim} F_{9 - 1, 7 - 1} = F_{8, 6} $. Rigetto $ H_{0} $ se $ F > c $, con $ \mathbb{P}_{H_{0}} (\mathcal{F} > c) = \alpha = 0.05 \implies F_{F_{8,6}} (c) = 0.95 \implies c = 4.15 $. $ \mathcal{F} = \frac{2.5}{1.81} = 1.38 < c \implies $ accetto $ H_{0} $
+
+$ Z \stackrel{H_{0}}{\defeq} \frac{\overline{X}_{A} - \overline{X}_{B} - \overbrace{(\mu_{A} - \mu_{B})}^{= 0}}{\sqrt{\frac{(n_{A} - 1)S^{2}_{A} + (n_{B} - 1) S^{2}_{B}}{n_{A} + n_{B} - 2}} \sqrt{\frac{1}{n_{A}} + \frac{1}{n_{B}}}} \stackrel{H_{0}}{\sim} t_{n_{A} + n_{B} - 2} $ con 
+\begin{itemize}
+\item $ \overline{X}_{A} \sim N \left(\mu_{A}, \frac{\sigma^{2}}{n_{A}} \right) $
+\item $ \overline{X}_{B} \sim N \left(\mu_{B}, \frac{\sigma^{2}}{n_{B}} \right) $
+\end{itemize}
+
+Rigetto $ H_{0} $ se $ \vert Z \vert > c $ con $ \mathbb{P}_{H_{0}} (\vert Z \vert > c) = \alpha $
+
+% grafico con gaussiana tagliata di alpha/2 a livello \pm c
+
+$ F_{t_{n_{A} + n_{B} - 2 = 14}} (c) = 1 - \frac{\alpha}{2} $ quindi $ c = 2.14 $, da cui $ \vert Z \vert = \vert - 1.08 \vert < c \implies $ accetto $ H_{0} $.  
+\end{proof}
+
+\begin{ex}
+I diametri di bulloni prodotti da una macchina sono variabili aleatorie distribuite come $ N(2, \sigma^{2}) $. Perch\'e i bulloni siano utilizzabili la deviazione standard $ \sigma^{2} $ non deve eccedere $ 0.04 $. Si estrae un campione di dimensione $ 16 $ e si trova che la deviazione standard stimata $ S = \sqrt{S^{2}_{n}} = 0.05 $, dove $ S^{2}_{n} = \frac{1}{n} \sum\limits_{i = 1}^{n} (X_{i} - 2)^{2} $. Si formuli il problema di verifica di ipotesi appropriato e si effettui il test usando $ \alpha = 0.05 $
+\end{ex}
+
+\begin{proof}
+\noindent
+\begin{enumerate}
+\item Si consideri il test
+\begin{itemize}
+\item $ H_{0}: \sigma \le 0.04 \leadsto \sigma^{2} \le (0.04)^{2} $
+\item $ H_{1}: \sigma > 0.04 \leadsto \sigma^{2} > (0.04)^{2} $
+\end{itemize}
+
+$ N $ appartiene alla famiglia esponenziale e quindi il test UMP usa $ C = \{ \underline{x} \in \mathbb{R}^{16} : \sum\limits_{i = 1}^{16} (X_{i} - 2) \ge c \} $ con $ \alpha = \mathbb{P} (\sum\limits_{i = 1}^{16} (X_{i} - 2)^{2} \ge c \vert \sigma^{2} = 0.0016) $
+
+Si sa che $ \frac{\sum\limits_{i = 1}^{16} (X_{i} - 2)^{2}}{\sigma^{2}} \sim \chi^{2}_{16} $, in quanto somme di normali, e quindi $ \alpha = \mathbb{P} \left( \underbrace{\frac{\sum\limits_{i = 1}^{16} (X_{i} - 2)^{2}}{0.0016}}_{\sim \chi^{2}_{16}} \ge \frac{c}{0.0016} \right) $ e quindi $ F_{\chi^{2}_{16}} \left( \frac{c}{0.0016} \right) = 1 - \alpha = 0.95  \implies \frac{c}{0.0016} = 26.296 \implies c = 0.042 $, perci\`o $ C = \{ \underline{x} \in \mathbb{R}^{16} : \sum\limits_{i = 1}^{16} (X_{i} - 2)^{2} \ge 0.042 \} $. $ \sum\limits_{i = 1}^{16} (X_{i} - 2)^{2} = 16 S_{n}^{2} = 16 (0.05)^{2} = 0.04 \not\in C \implies $ accetto $ H_{0} $
+
+\item Ora si consideri i test
+\begin{itemize}
+\item $ H_{0}: \sigma > 0.04 \leadsto \sigma^{2} > (0.04)^{2} $
+\item $ H_{1}: \sigma \le 0.04 \leadsto \sigma^{2} \le (0.04)^{2} $
+\end{itemize}
+
+$ C = \{ \underline{x} \in \mathbb{R}^{16} : \sum\limits_{i = 1}^{16} (X_{i} - 2)^{2} \le c \} $ con $  \alpha = \mathbb{P} \left( \underbrace{\frac{\sum\limits_{i = 1}^{16} (X_{i} - 2)^{2}}{0.0016}}_{\sim \chi^{2}_{16}} \le \frac{c}{0.0016} \right) $
+
+% TODO: grafico F_{a, b} con parte iniziale tagliata di alpha a livello c 
+
+$ F_{\chi^{2}_{16}} \left( \frac{c}{0.0016} \right) = \alpha = 0.05 \implies \frac{c}{0.0016} = 7.962 \implies c = 0.013 \implies \sum\limits_{i = 1}^{16} (X_{i} - 2)^{2} = 0.04 \not\in C \implies $ accetto $ H_{0} $
+\end{enumerate}
+\end{proof}
+
+\begin{ex}[Primo compitino 21 nov 2014]
+Siano $ X_{1}, \dotsc, X_{n} \sim f(x, \theta) = \frac{4 x^{3}}{\theta^{4}} \mathbbm{1}_{[0, \theta]} (x) $ con $ \theta > 0 $.
+
+\begin{enumerate}
+\item Determinare lo stimatore ML $ \ML{\theta} $;
+\item Determinare se $ \ML{\theta} $ \`e sufficiente e completa per $ \theta $;
+\item Determinare uno stimatore UMVU per $ \theta $;
+\item Verificare, se possibile, se lo stimatore del punto 3. \`e efficiente.
+\end{enumerate}
+\end{ex}
+
+\begin{proof}
+\noindent
+\begin{enumerate}
+\item $ L(\underline{x}, \theta) = \left( \frac{4}{\theta^{4}} \right)^{n} \prod\limits_{i = 1}^{n} x_{i}^{3} \prod\limits_{i = 1}^{n} \mathbbm{1}_{[0, \theta]} (x_{i}) = \left( \frac{4}{\theta^{4}} \right)^{n} \prod\limits_{i = 1}^{n} x_{i}^{3} \prod\limits_{i = 1}^{n} \mathbbm{1}_{[\max X_{i}, +\infty)} (\theta) $. Si noti che l'intervallo della funzione caratteristica dipende da $ \theta $ e quindi non si pu\`o trovare il massimo derivando. Si nota per\`o che $ \left( \frac{4}{\theta^{4}} \right) $ \`e monotona decrescente per $ \theta $ all'interno di $ [0, \theta] $ quindi $ \ML{\theta} = \max\limits_{i} X_{i} $
+\item $ f $ non appartiene alla famiglia esponenziale dato che il supporto della funzione caratteristica dipende da $ \theta $ quindi applico la fattorizzazione di Fisher-Neymann: 
+\[ L(\underline{x}, \theta) = \underbrace{\left( \frac{4}{\theta^{4}} \right)^{n} \prod\limits_{i = 1}^{n} x_{i}^{3}}_{g(\ML{\theta}, \theta)} \underbrace{\mathbbm{1}_{[\max X_{i}, +\infty)} (\theta) \prod\limits_{i = 1}^{n}}_{h(\underline{x})} \]
+
+Perci\`o $ \ML{\theta} $ \`e sufficiente.
+\item Sia $ T(\underline{X}) = \max\limits_{i} X_{i} $, quindi, con $ 0 \le y \le \theta $ si ha che $ F_{T} (y) = \mathbb{P} (T(\underline{X}) \le y) = [\mathbb{P}(X \le y)]^{n} = \left[ \int\limits_{0}^{y} \frac{4 x^{3}}{\theta^{4}} \, \mathrm{d}x \right]^{n} = \left[ \frac{x^{4}}{\theta^{4}} \right]^{n} $ perci\`o $ F_{T} (y) = \begin{cases} 0 & y \le 0 \\ \left[ \frac{x^{4}}{\theta^{4}} \right]^{n} & 0 \le y \le \theta \\ 1 & y \ge \theta \end{cases} $. $ f_{T} (y) = \frac{4 n y^{4n - 1}}{\theta^{4n}} \mathbbm{1}_{[0, \theta]} (y) $.
+
+$ T $ \`e completa se $ \mathbb{E}_{\theta} [g(T)] = 0, \forall\ \theta \implies g(x) \equiv 0, \mathbb{P}_{\theta} $-q.c., $ \forall\ \theta $. Quindi $ \mathbb{E}_{\theta} [g(T)] = \int\limits_{0}^{\theta} \frac{4 n y^{4n - 1}}{\theta^{4n}} g(y) \, \mathrm{d}y = 0, \forall\ \theta > 0 \iff \int\limits_{0}^{\theta} y^{4n - 1} g(y) \, \mathrm{d}y = 0, \forall\ \theta > 0 $. Derivando rispetto a $ \theta $ si ottiene che $ \theta^{4n - 1} g(\theta) = 0, \forall\ \theta > 0 \iff g(\theta) = 0, \forall\ \theta > 0 \implies g(\theta) = 0, \mathbb{P}_{\theta} $-q.c., $ \forall\ \theta > 0 $
+\item $ \mathbb{E} [\max\limits_{i} X_{i} = \int\limits_{0}^{\theta} \frac{4 n y^{4n}}{\theta^{4n}} \, \mathrm{d}y = \left[ \frac{4n}{\theta^{4n}} \frac{y^{4n + 1}}{4n + 1} \right]^{\theta}_{0} = \frac{4n \theta}{4n + 1} \implies Z = \frac{4n + 1}{4n} \max\limits_{i} X_{i} $ \`e non distorto per $ \theta $ e dipende solo dal campione attraverso $ \max X_{i} $ che \`e sufficiente e completa, quindi per il lemma di Lehmann-Scheff\'e \`e UMVU
+\item Non si pu\`o applicare Cramer-Rao perch\'e il supporto della funzione caratteristica dipende da $ \theta $ e quindi non \`e efficiente.
+\end{enumerate}
+\end{proof}
+\end{document}

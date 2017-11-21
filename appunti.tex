@@ -1,0 +1,1578 @@
+\documentclass[hidelinks, 10pt]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{gensymb}
+\usepackage{bbm}
+\usepackage{marvosym}
+\usepackage{xcolor}
+\usepackage{blindtext}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{cancel}
+\usepackage{breqn}
+\usepackage{verbatim}
+\usepackage{mathtools}
+\usepackage{epsfig}
+\usepackage{epstopdf}
+\usepackage{titling}
+\usepackage{url}
+\usepackage{array}
+\usepackage{tikz}
+% \usepackage[a4paper]{geometry}
+
+\usetikzlibrary{arrows, automata, backgrounds, calendar, chains, matrix, mindmap, patterns, petri, shadows, shapes.geometric, shapes.misc, spy, trees}
+
+\author{Micheletti-Aletti}
+\date{A.A. 2017-2018}
+\title{CPSM 2}
+
+\DeclareMathOperator{\var}{var}
+\DeclareMathOperator{\cov}{cov}
+
+\begin{document}
+\newcommand{\defeq}{\vcentcolon=}
+\newcommand{\eqdef}{=\vcentcolon}
+\providecommand{\ML}[1]{\hat{#1}_{\text{ML}}}
+\providecommand{\compl}[1]{\prescript{c}{}{#1}}
+
+\theoremstyle{plain}
+\newtheorem{thm}{Teorema}[]
+
+\theoremstyle{definition}
+\newtheorem{defn}[]{Definizione}
+\newtheorem{prop}[]{Proposizione}
+\newtheorem{cor}[]{Corollario}
+\newtheorem{lem}[]{Lemma}
+\newtheorem{oss}[]{Osservazione}
+\newtheorem{nota}[]{Nota}
+\newtheorem{es}[]{Esempio}
+\newtheorem{ex}[]{Esercizio}
+
+\maketitle
+\chapter*{Avvertenze}
+\pagenumbering{gobble}
+Queste dispense sono nate dal lavoro di alcuni studenti volenterosi che hanno messo a disposizione i propri appunti, cercando di offrire il miglior lavoro possibile da lasciare ai posteri. Dato che tale lavoro non \`e stato revisionato da nessuno, questo documento pu\`o eventualmente contenere errori.
+
+Le persone che hanno contribuito alla realizzazione della dispensa non si assumono alcuna responsabilit\`a di eventuali errori e invitano gli usufruitori a segnalare eventuali errori o a modificare il codice sorgente del file \LaTeX
+
+% \newpage
+% \tableofcontents
+% \newpage
+
+\chapter{Statistica}
+\section{Tipi di convergenza di variabili aleatorie}
+\pagenumbering{arabic}
+
+\begin{defn}
+Sia $  \{ X_n \} $ una successione di variabili aleatorie e $ X $ una variabile aleatoria definite su $ (\Omega, \mathcal{F}, \mathbb{P}) $:
+
+\begin{itemize}
+\item $ X_n $ converge quasi certamente ad $ X $ ($ X_n \stackrel{q.c.}{\to} X $) se $ \mathbb{P} (\{ \omega \in \Omega : X_n (\omega) \stackrel{n \to +\infty}{\to} X (\omega) \}) = 1 $. \`E la convergeza pi\`u forte che si possa avere.
+\item $ X_n $ converge in probabilit\`a ad $ X $ ($ X_n \stackrel{p}{\to} X $) se $ \lim\limits_{n \to +\infty} \mathbb{P} (\{ \omega \in \Omega : \vert X_n (\omega) - X (\omega) \vert > \varepsilon \}) = 0 $ o, eventualmente, $ \lim\limits_{n \to +\infty} \mathbb{P} (\{ \omega \in \Omega : \vert X_n (\omega) - X (\omega) \vert \le \varepsilon \}) = 1 $. $ X_n \stackrel{p}{\to} X $ inoltre se dette $ \{ F_{n} \} $ le cdf associate a $ \{ X_n \} $ e $ F $ la cdf associata a $ X $ si ha che $ \lim\limits_{n \to +\infty} F_n (x) = F(x), \forall\ x $ punto di continuit\`a di $ F $
+\item $ X_n $ converge in media quadratica a $ X $ ($ X_n \stackrel{L^{2}}{\to} X $) se $ \lim\limits_{n \to +\infty} \mathbb{E} [\vert X_n - X \vert^{2}] = 0 $. $ X_n $ converge in media $ p $-esima a $ X $ ($ X_n \stackrel{L^{p}}{\to} X $) se $ \lim\limits_{n \to +\infty} \mathbb{E} [\vert X_n - X \vert^{p}] = 0 $
+\end{itemize}
+\end{defn}
+
+\begin{thm}
+\begin{figure}[H]	% TODO: Farlo meglio
+\begin{tikzpicture}
+	\fill (0,4) node[above] {$ X_{n} \stackrel{q.c.}{\to} X $};
+	\fill (4,2) node[above] {$ X_{n} \stackrel{p}{\to} X $};
+	\fill (6,2) node[above] {$ X_{n} \stackrel{d}{\to} X $};
+	\fill (0,0) node[above] {$ X_{n} \stackrel{L^{2}}{\to} X $};
+	\fill (2,0) node[above] {$ X_{n} \stackrel{L^{p}}{\to} X $};
+	\draw[->] (0,4) -- (4,2);
+	\draw[->] (4,2) -- (6,2);
+	\draw[->] (0,0) -- (2,0);
+	\draw[->] (2,0) -- (4,2);
+\end{tikzpicture}
+\end{figure}
+\end{thm}
+
+\begin{es}[TLC]
+Siano $ X_1, \dotsc, X_n $ v.a. i.i.d con $ \mathbb{E} [X_i] = \mu $, $ \var(X_i) = \sigma^2 $ e $ \overline{X}_n = \frac{1}{n} \sum\limits_{i = 1}^{n} X_i $. Allora
+\[ \frac{\overline{X}_n - \mu}{\sqrt{\frac{\sigma^2}{n}}} \stackrel{d}{\to} Z \sim N(0, 1) \]
+
+Notare che $ \frac{\overline{X}_n - \mu}{\sqrt{\frac{\sigma^2}{n}}} = \frac{\sqrt{n} \sum\limits_{i = 1}^{n} X_i - \sqrt{n} \mu}{\sigma} $.
+\end{es}
+
+\begin{defn}
+Siano $ X_1, \dotsc, X_n $ v.a. con funzione di verosimiglianza $ L(\underline{x}, \underline{\theta}) $ con $ \theta \in \Theta \subseteq \mathbb{R}^k $. Uno stimatore $ \underline{T} $ di $ \underline{\theta} $ \`e una funzione del campione $ \underline{T} = \underline{T} (X_1, \dotsc, X_n) : \mathbb{R}^n \to \mathbb{R}^p $, con $ n \ge p \ge k $, misurabile. Tale funzione \`e una particolare statistica e se $ x_1, \dotsc, x_n $ \`e la realizzazione del campione $ \underline{T} (x_1, \dotsc, x_n) $ \`e detta stima. 
+\end{defn}
+
+\section{Propriet\`a dello stimatore}
+\begin{enumerate}
+\item Consistenza: $ \underline{\hat{\theta}}_n = \underline{T} (X_1, \dotsc, X_n) $ \`e uno stimatore consistente di $ \underline{\theta} $ se $ \lim\limits_{n \to +\infty} \underline{\hat{\theta}}_n = \underline{\theta} $. Se tente in probabilit\`a si dice che $ \underline{\hat{\theta}}_n $ \`e debolmente consistente, se invece tende quasi certamente allora \`e fortemente consistente. Ci\`o implica che $ \overline{X}_n $ \`e fortemente consistente per $ \mathbb{E} [X_i] $ (caso iid)
+\item Non distorsione: $ \underline{\hat{\theta}}_n = \underline{T} (X_1, \dotsc, X_n) $ \`e non-distorto per $ \underline{\theta} $ se $ \mathbb{E}_\theta [ \underline{\hat{\theta}}_n ] = \underline{\theta}, \forall\ n \in \mathbb{N}, \forall\ \underline{\theta} \in \Theta $. Se $ X_i $ iid con $ \mathbb{E} [X_i] = \mu $ allora $ \mathbb{E} [\overline{X}_n] = \mu, \forall\ n, \mu $
+\item Efficienza: Sia $ \theta \in \Theta \subseteq \mathbb{R} $ e 
+\begin{itemize}
+\item $ \hat{\theta}_1 = T_1 (X_1, \dotsc, X_n) : \mathbb{R}^n \to \mathbb{R} $
+\item $ \hat{\theta}_2 = T_2 (X_1, \dotsc, X_n) : \mathbb{R}^n \to \mathbb{R} $
+\end{itemize}
+sono stimatori di $ \theta $ non distorti, si dice che $ \hat{\theta}_1 $ \`e pi\`u efficiente di $ \hat{\theta}_2 $ se $ \var(\hat{\theta}_1) \le \var(\hat{\theta}_2) $
+\item Asintotica normalit\`a: $ \underline{\hat{\theta}}_n = \underline{T} (X_1, \dotsc, X_n) $ \`e asintoticamente normale ($ \underline{\hat{\theta}}_n \sim AN(\theta, \sigma_n^2) $) se $ \frac{\underline{\hat{\theta}}_n - \theta}{\sqrt{\sigma^2_n}} \stackrel{d}{\to} N(0, 1) $ per $ n \to +\infty $. Ad esempio, $ \overline{X}_n \sim AN \left( \mu, \frac{\sigma^2}{n} \right) $
+\item Sufficienza: Se $ X_1, \dotsc, X_n $ \`e un campione, non necessariamente iid, con funzione di verosimiglianza $ L(\underline{x}, \underline{\theta}) $ con $ \underline{\theta} \in \Theta \subseteq \mathbb{R}^k $ e $ T : \mathbb{R}^n \to \mathbb{R}^p $, con $ n \ge p \ge k $, e $ T(\underline{X}) $ \`e uno stimatore di $ \underline{\theta} $, si dice che $ T(\underline{X}) $ \`e sufficiente per $ \underline{\theta} $ se $ L() $ \`e indipendente da $ \underline{\theta}, \mathbb{P}_{\underline{\theta}} $ q.c., ovvero tranne per un insieme $ S $ tale che $ \mathbb{P}_{\underline{\theta}} (S) = 0, \forall\ \underline{\theta} \in \Theta $. 
+\end{enumerate}
+
+\begin{es}
+Sia $ \underline{X} = (X_1, \dotsc, X_n) $ iid $ \sim B(\theta) $. Si consideri $ T(\underline{X}) = \sum\limits_{i = 1}^{n} X_i \sim B(n, \theta) $. Sia $ \underline{x} = (x_1, \dotsc, x_n) $ una realizzazione del campione, allora $ t = T(\underline{x}) = \sum\limits_{i = 1}^{n} x_i $.
+
+$ \mathbb{P}(X_1 = x_1, \dotsc, X_n = x_n, T = t) = \begin{cases} \theta^{t} (1 - \theta)^{n - t} & \sum\limits_{i = 1}^{n} x_{i} = t \\ 0 & \text{altrimenti} \end{cases} $
+
+Quindi $ \mathbb{P} (X_1 = x_1, \dotsc, X_n = x_n \vert T = t) = \frac{\mathbb{P}(X_1 = x_1, \dotsc, X_n = x_n, T = t)}{\mathbb{P} (T = t)} = \frac{\cancel{\theta^t} \cancel{(1 - \theta)^{n -t}}}{\binom{n}{t} \cancel{\theta^t} \cancel{(1 - \theta)^{n - t}}} = \frac{1}{\binom{n}{t}} $ se $ \sum\limits_{i = 1}^{n} x_i = t $
+\end{es}
+
+\begin{thm}[Fattorizzazione di Fisher-Neyman]
+Siano
+\begin{itemize}
+\item $ \underline{X} = (X_1, \dotsc, X_n) $ campione con funzione di verosimiglianza $ L(\underline{x}, \underline{\theta}) $, con $ \underline{\theta} \in \Theta \subseteq \mathbb{R}^k $
+\item $ \underline{T} = \underline{T}(\underline{X}) $ stimatore di $ \underline{\theta} $
+\end{itemize}
+
+$ \underline{T} $ \`e sufficiente per $ \underline{\theta} \iff L(\underline{x}, \underline{\theta}) = g(\underline{T}(\underline{X}, \underline{\theta})) h(\underline{X}) $ dove:
+\begin{itemize}
+\item $ g $ dipende da $ \underline{X} $ solo da $ \underline{T} $;
+\item $ h $ \`e indipendente da $ \underline{\theta} $. 
+\end{itemize}
+\end{thm}
+
+\begin{proof}
+Il teorema viene dimostrato nel caso discreto. Per il caso continuo si devono conoscere avanzati argomenti di teoria della misura.
+
+\begin{itemize}
+\item[$ \Leftarrow $] Si supponda che valga la fattorizzazione. Dato che $ \underline{T} = \underline{T} (\underline{X}): \mathbb{R}^n \to \mathbb{R}^m $, con $ n \ge m \ge k $, si consideri $ \underline{t} \in \mathbb{R}^m : \mathbb{P}_{\underline{\theta}} (\underline{T}(\underline{X}) = \underline{t}) > 0, \forall\ \underline{\theta} $.
+
+Dato che:
+\begin{itemize}
+\item $ \mathbb{P}_{\underline{\theta}} (\underline{T} = \underline{t}) = \mathbb{P}_{\underline{\theta}} (\underline{T} (X_1, \dotsc, X_n) = \underline{t}) = \sum\limits_{\{ \underline{x}' \in \mathbb{R}^n : \underline{T} (\underline{x}') = \underline{t} \}} \mathbb{P}_{\underline{\theta}} (X_1 = x_1', \dotsc, X_n = x_n') = \sum\limits_{\{ \ldots \}} L(\underline{x}', \underline{\theta}) = \sum\limits_{\{ \ldots \}} g(\underline{T}(\underline{x}'), \underline{\theta}) h(\underline{x}') = g(\underline{t}, \underline{\theta}) \sum\limits_{\{ \ldots \}} h(\underline{x}') $;
+\item $ \mathbb{P}_{\underline{\theta}} (X_1 = x_1', \dotsc, X_n = x_n' \vert \underline{T} = \underline{t}) = \frac{\mathbb{P}_{\underline{\theta}} (X_1 = x_1', \dotsc, X_n = x_n', \underline{T} = \underline{t})}{\underbrace{\mathbb{P}_{\underline{\theta}} (\underline{T} = \underline{t})}_{\ne 0 \text{ se } \underline{t} = \underline{T}(\underline{x}')}} $
+\end{itemize}
+
+Quindi, dato che $ \underline{t} = \underline{T}(\underline{x}') $ si ha che $ \frac{\mathbb{P}_{\underline{\theta}} (X_1 = x_1', \dotsc, X_n = x_n', \underline{T} = \underline{t})}{\mathbb{P}_{\underline{\theta}} (\underline{T} = \underline{t})} = \frac{L(\underline{x}', \underline{\theta})}{g(\underline{t}, \underline{\theta}) \sum\limits_{\{ \ldots \}} h(\underline{x}')} = \frac{g(\underline{T}(\underline{x}'), \underline{\theta}) h(\underline{x}')}{g(\underline{t}, \underline{\theta}) \sum\limits_{\{ \ldots \}} h(\underline{x}')} = \frac{\cancel{g(\underline{t}, \underline{\theta})} h(\underline{x}')}{\cancel{g(\underline{t}, \underline{\theta}}) \sum\limits_{\{ \ldots \}} h(\underline{x}')} $ indipendente da $ \underline{\theta} $ e quindi sufficiente;
+
+\item[$ \Rightarrow $] $ \underline{T} $ \`e sufficiente per $ \underline{\theta} $, quindi $ \mathbb{P}_{\underline{\theta}} (X_1 = x_1', \dotsc, X_n = x_n' \vert \underline{T} (\underline{x}') = \underline{t}) = h(\underline{x}, \underline{T}) $, indipendente da $ \underline{\theta} $.
+
+Perci\`o, $ L(\underline{x}, \underline{\theta}) = \mathbb{P}_{\underline{\theta}} (X_1 = x_1', \dotsc, X_n = x_n', \underline{T} = \underline{t}) = \mathbb{P}_{\underline{\theta}} (X_1 = x_1', \dotsc, X_n = x_n' \vert \underline{T} = \underline{t}) \mathbb{P}_{\underline{\theta}} (\underline{T} = \underline{t}) = h(\underline{x}) g(\underline{T}, \underline{\theta}) $
+\end{itemize}
+\end{proof}
+
+\begin{cor}	\label{cor:1}
+Se $ \underline{T} = \underline{T} (X_1, \dotsc, X_n) $ \`e sufficiente per $ \underline{\theta} $ e $ \underline{T} = \underline{H}(\underline{U}) $, ovvero un'altra statistica del campione, allora $ \underline{U} $ \`e sufficiente per $ \underline{\theta} $.
+\end{cor}
+
+\begin{proof}
+$ \underline{T} $ sufficiente per $ \underline{\theta} \implies L (\underline{x}, \underline{\theta}) = g(\underline{T}(\underline{x}), \underline{\theta}) h(\underline{x}) = g(\underline{H}(\underline{U}(\underline{x})), \underline{\theta}) h(\underline{x}) $, dove
+\begin{itemize}
+\item $ g $ dipende da $ \underline{x} $ solo attraverso $ \underline{U} $;
+\item $ h $ \`e indipendente da $ \theta $.
+\end{itemize}
+\end{proof}
+
+\begin{nota}
+Se $ \underline{H} $ \`e invertibile, cio\`e $ \underline{T} = \underline{H}(\underline{U}) $ e $ \underline{U} = \underline{H}^{-1}(\underline{T}) $, allora $ \underline{T} $ \`e sufficiente $ \iff \underline{U} $ \`e sufficiente, ovvero $ \underline{T} $ e $ \underline{U} $ sono equivalenti.
+\end{nota}
+
+\begin{defn}
+Una statistica $ \underline{T} \in \mathbb{R}^p $ sufficiente per $ \underline{\theta} \in \Theta \subseteq \mathbb{R}^k $, con $ p \ge k $, \`e detta minima se $ \not\exists\ \underline{U} \in \mathbb{R}^m $, con $ p \ge m \ge k $, ad essa equivalente.
+\end{defn}
+
+\section{Famiglia esponenziale}
+Viene considerato $ \theta \in \Theta \subseteq \mathbb{R} $.
+
+\begin{defn}
+Una v.a. $ X $ \`e appartenente alla famiglia esponenziale se la sua densit\`a di probabilit\`a si pu\`o scrivere nella seguente forma, $ \forall\ x \in \mathbb{R} $:
+
+\[ f(x, \theta) = C(\theta) e^{Q(\theta) T(x)} h(x) \]
+
+dove:
+\begin{itemize}
+\item $ C(\theta) > 0, \forall\ \theta \in \Theta $;
+\item $ h(x) > 0, \forall\ x \in S $ con $ S $ indipendente da $ \theta $
+\end{itemize}
+\end{defn}
+
+Se $ X_1, \dotsc, X_n $ iid $ \sim f(x, \theta) $ allora $ L(\underline{x}, \underline{\theta}) = \prod\limits_{i = 1}^{n} f(x_i, \theta) = C(\theta)^n e^{Q(\theta) \sum\limits_{i = 1}^{n} T(x_i)} \prod\limits_{i = 1}^{n} h(x_i) $. Fissato $ \tilde{T} = \sum\limits_{i = 1}^{n} T(x_i) $ vale la fattorizzazione di Fisher-Neyman.
+
+\begin{es}
+\begin{itemize}
+\item Sia $ X \sim B(n, \theta) $ con $ n $ noto e $ \theta $ incognito. Allora, avendo definito $ A = \{ 0, 1, \dotsc, n \} \subseteq \mathbb{N} $, si ha che $ f(x, \theta) = \binom{n}{x} \theta^x (1 - \theta)^{n-x} \mathbbm{1}_{A} (x) = (1 - \theta)^n \left( \frac{\theta}{1 - \theta} \right)^x \binom{n}{x} \mathbbm{1}_A (x) = \underbrace{(1 - \theta)^n}_{C(\theta)} e^{\underbrace{x}_{T(x)} \underbrace{\log \left( \frac{\theta}{1 - \theta} \right)}_{Q(\theta)}} \underbrace{\binom{n}{x} \mathbbm{1}_A (x)}_{h(x)} $. Quindi $ T(x) = x \implies \sum\limits_{i = 1}^{n} T(x_i) = \tilde{T} $ \`e sufficiente per $ \theta $.
+
+Se $ X_1, \dotsc, X_n \sim B (1, \theta) $ allora $ \hat{\theta} = \frac{1}{n} \sum\limits_{i = 1}^{n} X_i = \frac{1}{n} \hat{T} $ \`e sufficiente per il corollario \ref{cor:1} e non distorto.
+\item $ N(\theta, \sigma^2) \implies T(x) = x $
+\item $ N(\mu, \theta) \implies T(x) = (x - \mu)^2 $
+\item $ Po(\theta, \sigma^2) \implies T(x) = x $
+\item $ \Gamma(a, \theta) \implies T(x) = x $
+\item $ \Gamma(\theta, b) \implies T(x) = \log (x) $
+\end{itemize}
+\end{es}
+
+\begin{defn}
+Sia $ \underline{X} = (X_1, \dotsc, X_n) $ campione con funzione di verosimiglianza $ L(\underline{x}, \underline{\theta}) $, con $ \underline{\theta} \in \Theta \subseteq \mathbb{R}^k $. Si dice che una statistica $ V = V(\underline{X}) $ \`e ancillare se la sua distribuzione non dipende dal parametro $ \theta $. Si dice che una statistica \`e ancillare uniforme (del primo ordine) se $ \mathbb{E}_{\theta} [V(\underline{X})] $ \`e costante $ \forall\ \theta \in \Theta $.
+\end{defn}
+
+\begin{es}
+\noindent
+\begin{itemize}
+\item Sia $ X_1, \dotsc, X_n $ con $ \theta \in \Theta \subseteq \mathbb{R} $. $ L(\underline{x}, \theta) = \prod\limits_{i = 1}^{n} f(x_i, \theta) $ con pdf nota. $ \{ L(\underline{x}, \theta) : \theta \in \Theta \} $ \`e detta "location family". Le differenze $ X_i - X_j $ con $ i \ne j $ sono statistiche ancillari;
+\item Se $ f \sim U \left( -\frac{1}{2}, \frac{1}{2} \right) \leadsto U \left( \theta - \frac{1}{2}, \theta + \frac{1}{2} \right) $. $ \underline{T} = (\min\limits_{i} X_i, \max\limits_{i} X_i ) $ \`e sufficiente per $ \theta $ ed \`e anche minima. $ \max\limits_{i} X_i - \min\limits_{i} X_i $ \`e ancillare, quindi non sar\`a completa.
+\end{itemize}
+\end{es}
+
+Una statistica completa non deve contenere statistiche ancillari del primo ordine, ovvero, data una funzione $ g $ misurabile, se $ \mathbb{E}_{\theta} [g(T)] $ \`e costante $ \forall\ \theta \in \Theta $ allora $ g(x) $ \`e costante $ \mathbb{P}_{\theta} $ q.c.
+
+\begin{defn}
+Sia $ \underline{X} = (X_1, \dotsc, X_n) $ campione con funzione di verosimiglianza $ L(\underline{x}, \underline{\theta}) $ con $ \underline{\theta} \in \Theta \subseteq \mathbb{R}^k $ e sia $ T = T(\underline{X}) $ una statistica. $ T $ \`e detta completa se $ \mathbb{E}_{\theta}[g(T)] = 0, \forall\ \theta \in \Theta $ implica $ g(X) \equiv 0, \mathbb{P}_{\underline{\theta}} $ q.c., cio\`e $ \forall\ x \in S $ con $ \mathbb{P}_{\underline{\theta}} (S) = 1 $.
+\end{defn}
+
+\begin{defn}
+Una statistica non distorta a varianza minima per un parametro $ \theta $ \`e detta ottimale (UMVU, \emph{Uniformly minimum variance unbiased}).
+\end{defn}
+
+\begin{thm}[Rao-Blackwell]
+Sia $ \underline{X} = (X_1, \dotsc, X_n) $ campione con funzione di verosimiglianza $ L(\underline{x}, \theta) $ con $ \theta \in \Theta \subseteq \mathbb{R} $. Sia $ T = T(\underline{X}) $ una statistica del campione sufficiente per $ \theta $ e $ U = U(\underline{X}) $ una statistica non distorta per $ \theta $ e che non sia funzione solo di $ T $ (altrimenti verrebbero a coincidere). Posto $ \phi(t) \eqdef \mathbb{E}_{\theta} [U \vert T = t] $ si hanno i seguenti risultati:
+\begin{enumerate}
+\item la v.a. $ \phi(T) = \phi(t) \circ T $ non dipende da $ \theta $ ed \`e funzione solo di $ T $;
+\item $ \phi(T) $ \`e non distorta per $ \theta $;
+\item $ \var_{\theta} (\phi(T)) \le \var_{\theta} (U), \forall\ \theta \in \Theta $.
+\end{enumerate}
+\end{thm}
+
+\begin{proof}
+\noindent
+\begin{enumerate}
+\item $ \phi(T) = \mathbb{E}_{\theta} [U \vert T] = \int\limits_{\mathbb{R}^n} U(\underline{x}) L(\underline{x} \vert T) \, \mathrm{d}\underline{x} $, che \`e indipendente da $ \theta $;
+\item Si dimostra attraverso la propriet\`a della torre, ovvero se $ X, Y $ sono v.a. allora $ \mathbb{E} \left[  \mathbb{E} [X \vert Y] \right] = \mathbb{E} [X] $. Quindi $ \mathbb{E}_{\cancel{\theta}} [\phi(T)] = \mathbb{E}_{\cancel{\theta}} \left[ \mathbb{E}_{\cancel{\theta}} [U \vert T] \right] = \mathbb{E}_{\theta} [U] = \theta, \forall\ \theta \in \Theta $;
+\item Si dimostra dalla propriet\`a della torre che se $ X, Y $ sono v.a. allora $ \var (\mathbb{E} [X \vert Y]) \le \var(X) $. Quindi $ \var_{\theta} (\phi(T)) = \var_{\theta} (\mathbb{E}[U \vert T]) \le \var_{\theta} (U) $.
+\end{enumerate}
+\end{proof}
+
+La tecnica per costruire una statistica con varianza minima e non distorta da due statistiche, una non distorta e l'altra sufficiente, si dice \emph{raoblackwellization}.
+
+\begin{thm}[Lehmann-Scheff\'e]
+Sia $ \underline{X} = (X_1, \dotsc, X_n) $ campione con funzione di verosimiglianza $ L(\underline{x}, \theta) $ con $ \theta \in \Theta \subseteq \mathbb{R} $, e sia $ U = U(T) $ una statistica non distorta per $ \theta $ e funzione solo di $ T $. Se $ T $ \`e sufficiente e completa allora \`e l'unica statistica UMVU per $ \theta $ q.c., ovvero se esiste un'altra $ V = V(T) $ UMVU per $ \theta $ allora $ U(x) = V(x), \forall\ x \in S $ con $ \mathbb{P}_{\theta} (S) = 1, \forall\ \theta $.
+\end{thm}
+
+\begin{proof}
+$ U $ e $ V $ non distorte per $ \theta $ implica che $ \mathbb{E}_{\theta} [\underbrace{U(T(\underline{X})) - V(T(\underline{X}))}_{g(T)}] = 0, \forall\ \theta \in \Theta $. Per la completezza di $ T $ si ha che $ g(x) = 0, \mathbb{P}_{\theta} $ q.c. $ \forall\ \theta $, ossia $ U(x) = V(x), \forall\ x \in S $ con $ \mathbb{P}_{\theta} (S) = 1, \forall\ \theta $.
+\end{proof}
+
+\begin{es}
+Sia $ X \sim U(0, \theta) $, con $ \theta \in \mathbb{R}^{+} $ e pdf $ f(x, \theta) = \begin{cases} \frac{1}{\theta} & x \in (0, \theta) \\ 0 & \text{altrimenti} \end{cases} $. Sia $ g $ funzione misurabile, allora $ \mathbb{E}_{\theta} [g(X)] = \int\limits_{0}^{\theta} g(x) \frac{1}{\theta} \, \mathrm{d}x = \frac{1}{\theta} \int\limits_{0}^{\theta} g(x) \, \mathrm{d}x $. Posto uguale a $ 0, \forall\ \theta \in \Theta $ si ha che $ \int\limits_{0}^{\theta} g(x) \, \mathrm{d}x = 0 $. Derivando entrambi i membri per $ \theta $ si ha che $ g(\theta) = 0, \forall\ \theta \in \Theta $, quindi $ T(x) = x $ \`e una statistica completa. 
+\end{es}
+
+\begin{defn}
+Sia $ \underline{X}: (\Omega, \mathcal{F}, \mathbb{P}) \to \mathbb{R}^k $ una v.a. con funzione di verosimiglianza $ L(\cdot, \underline{\theta}) $, con $ \theta \in \Theta \subseteq \mathbb{R}^q $ e $ g: \mathbb{R}^k \to \mathbb{R}^p $, con $ p \ge q $, una funzione misurabile ed esista $ \mathbb{E}_{\underline{\theta}} [g(\underline{X})], \forall\ \underline{\theta} \in \Theta $. Si dice che la famiglia $ \mathcal{F} = \{ L(\cdot, \underline{\theta}) : \underline{\theta} \in \Theta \} $ \`e completa se $ \forall\ g $ come sopra $ \mathbb{E}_{\underline{\theta}} [g(\underline{X})] = 0, \forall\ \underline{\theta} \in \Theta \implies g(x) = 0, \mathbb{P}_{\underline{\theta}} $ q.c. $ \forall\ \theta $.
+\end{defn}
+
+\begin{thm}
+Sia $ X $ una v.a. con $ f(x, \theta) = \underbrace{C(\theta)}_{> 0} e^{Q(\theta) T(x)} \underbrace{h(x)}_{h \ne h(\theta)} $ e sia $ \mathcal{G} = \{ f(x, \theta) : \theta \in \Theta \} $ allora $ \mathcal{G} $ \`e completa.
+
+Se $ \Theta $ contiene almeno un intervallo non degenere allora se $ X_1, \dotsc, X_n $ iid $ \sim f_{\theta} (x) $ appartenenti alla famiglia esponenziale allora la statistica $ T = \sum\limits_{i = 1}^{n} T(X_i) $ \`e completa per $ \theta $ se $ \Theta $ contiene almeno un intervallo non degenere.
+\end{thm}
+
+\section{Completezza e indipendenza}
+\begin{thm}
+Se $ \underline{X} = (X_1, \dotsc, X_n) $ con funzione di verosimiglianza $ L(\underline{x}, \theta) $, con $ \theta \in \Theta $ intervallo anche illimitato di $ \mathbb{R} $. Sia $ Y = Y(X_1, \dotsc, X_n) $ una statistica sufficiente e completa per $ \theta $. Sia $ Z = Z(\underline{X}) $ un'altra statistica non funzione solo di $ Y $. Se la distribuzione di $ Z $ non dipende da $ \theta $ allora $ Y $ e $ Z $ sono indipendenti. 
+\end{thm}
+
+\begin{proof}
+Viene dimostrato il teorema nel caso continuo, dato che nel caso discreto basa sostituire gli integrali con le sommatorie.
+
+Sia $ f_{y}(y, \theta) > 0, \forall\ y \in \mathbb{R} $ e $ f_{(Y, Z)} (y, z, \theta) $ la congiunta di $ (Y, Z) $ e $ f_{Z} (z) $ la pdf di $ Z $ indipendente da $ \theta $. $ \forall\ \theta \in \Theta $ si ha $ f_{Z} (z) = \int\limits_{-\infty}^{+ \infty} f_{Z} (z) f_{Y} (y, \theta) \, \mathrm{d}y $ ma per il teorema delle probabilit\`a totali nel continuo vale anche $ f_{Z} (z) = \int\limits_{-\infty}^{+\infty} f_{Z}(z \vert y) f_{Y} (y, \theta) \, \mathrm{d}y $ con $ f_{Z}(z \vert y) $ indipendente da $ \theta $ in quanto $ Y $ sufficiente. Sottraendo membro a membro si ottiene $ \int\limits_{-\infty}^{+\infty} [f_{Z}(z) - f_{Z} (z \vert y)] f_{Y} (y, \theta) \, \mathrm{d}y = 0, \forall\ \theta \in \Theta $, quindi $ \mathbb{E}_{Y, \theta} [f_{Z}(z) - f_{Z} (z \vert y)] = 0, \forall\ \theta \in \Theta $ e, per la completezza di $ Y $ si ha che $ f_{Z}(z, y) = f_{Z} (z) $ cio\`e $ f_{(Y, Z)} (y, z, \theta) = f_{Z}(z, y) f_{Y}(y, \theta) = f_{Z}(z) f_{Y}(y, \theta) $
+\end{proof}
+
+\begin{oss}
+Grazie al teorema si pu\`o dimostrare che se $ X_1, \dotsc, X_n $ iid $ \sim N(\mu, \sigma^2) $ allora $ \overline{X}_{n} = \frac{1}{n} \sum\limits_{i = 1}^{n} X_i $ e $ S^2_{n} = \frac{1}{n} \sum\limits_{i = 1}^{n} (X_i - \overline{X}_n)^2 $ sono indipendenti.
+\end{oss}
+
+\begin{proof}
+Per la dimostrazione \`e necessario l'uso della funzione generatrice di momenti di $ X $, ovvero $ M(t) \defeq \mathbb{E} [e^{t X}] $. Sapendo che $ \overline{X} $ \`e sufficiente e completa per $ \mu $, la tesi \`e che la distrinuzione di $ S^{2}_{n} $ \`e indipendente da $ \mu $.
+
+Quindi $ M(t) = \mathbb{E} \left[ e^{t S^{2}_{n}} \right] = \mathbb{E} \left[ \exp \left( \sum\limits_{i = 1}^{n} \frac{(X_i - \overline{X}_n)^2}{n} \right) \right] = \int\limits_{-\infty}^{+\infty} \dotsi \int\limits_{-\infty}^{+\infty} \exp \left( \sum\limits_{i = 1}^{n} \frac{(X_i - \overline{X}_n)^2}{n} \right) \left( \frac{1}{\sigma \sqrt{2 \pi}} \right)^2 \exp \left( - \sum\limits_{i = 1}^{n} \frac{(X_i - \mu)^2}{2 \sigma^2} \right) \, \mathrm{d}x_1 \dotsi \mathrm{d}x_n $.
+
+Posto $ w_i = x_i - \mu $, con $ i = 1, \dotsc, n $, si ha il seguente cambio di coordinate con jacobiano pari a $ 1 $:
+
+\[ M(t) = \int\limits_{-\infty}^{+\infty} \dotsi \int\limits_{-\infty}^{+\infty} \exp \left( \sum\limits_{i = 1}^{n} \frac{(w_i - \overline{w}_n)^2}{n} \right) \left( \frac{1}{\sigma \sqrt{2 \pi}} \right)^2 \exp \left( - \frac{1}{2 \sigma^2} \sum\limits_{i = 1}^{n} w_i^2 \right) \, \mathrm{d}w_1 \dotsi \mathrm{d}w_n \]
+
+non dipendente da $ \mu $, quindi $ S^{2}_{n} $ \`e indipendente da $ \mu $.
+\end{proof}
+
+\begin{thm}[Disuguaglianza di Cramer-Rao]
+Sia $ \underline{X} = (X_1, \dotsc, X_n) $ un campione con funzione di verosimiglianza $ L(\underline{x}, \theta) $ con $ \theta \in \Theta \subseteq \mathbb{R} $. Sia $ T = T(\underline{X}) $ uno stimatore della funzione $ \tau(\theta) $ del parametro $ \theta $. Siano inoltre soddisfatte le seguenti ipotesi:
+\begin{enumerate}
+\item $ \Theta $ sia un intervallo di $ \mathbb{R} $;
+\item il supporto della funzione di verosimiglianza $ L(\underline{x}, \theta) $ non dipende da $ \theta $, ovvero $ L(\underline{x}, \theta) > 0, \forall\ \underline{x} \in S \subseteq \mathbb{R}^n $ indipendente da $ \theta $;
+\item \noindent
+\begin{itemize}
+\item $ \frac{\mathrm{d}}{\mathrm{d} \theta} \int L(\underline{x}, \theta) \, \mathrm{d}\underline{x} = \int \frac{\partial}{\partial \theta} L(\underline{x}, \theta) \, \mathrm{d}\underline{x} $
+\item $ \frac{\mathrm{d}}{\mathrm{d} \theta} \int T(\underline{x}) L(\underline{x}, \theta) \, \mathrm{d}\underline{x} = \int T(\underline{x}) \frac{\partial}{\partial \theta} L(\underline{x}, \theta) \, \mathrm{d}\underline{x} $
+\end{itemize}
+\item $ \tau \in \mathcal{C}^{1} (\Theta) $;
+\item $ T(\underline{X}) \in L^2 (\mathbb{P}_{\theta}) $;
+\item $ \mathbb{E}_{\theta} [T(\underline{X})] = \tau(\theta), \forall\ \theta \in \Theta $, cio\`e $ T $ non \`e distorta per $ \tau(\theta) $.
+\end{enumerate}
+Allora
+
+\begin{equation}	\label{eq:e1}
+\var_{\theta} (T(\underline{X})) \ge \frac{\tau'(\theta)^2}{\mathbb{E}_{\theta} \left[ \left( \frac{\mathrm{d}}{\mathrm{d} \theta} \log L(\underline{x}, \theta) \right)^2 \right] } \forall\ \theta \in \Theta
+\end{equation}
+
+ovvero si ottiene un limite inferiore della varianza.
+\end{thm}
+
+\begin{oss}
+Non \`e detto che uno stimatore UMVU  soddisfi il minimo di Cramer-Rao, dato che la stima \`e troppo ottimistica.
+\end{oss}
+
+\begin{defn}
+Uno stimatore che realizza l'uguaglianza di Cramer-Rao \`e detta efficiente, quindi stimatori efficienti sono anche UMVU ma non \`e valido il viceversa.
+\end{defn}
+
+\begin{proof}
+Partendo dal fatto che $ 1 = \int\limits_{S} L(\underline{x}, \theta) \, \mathrm{d}\underline{x} $, cio\`e l'integrale sul dominio della densit\`a di probabilit\`a \`e pari a $ 1 $, derivando per $ \theta $ e usando la propriet\`a 3., si ha che $ 0 = \frac{\mathrm{d}}{\mathrm{d} \theta} 1 = \frac{\mathrm{d}}{\mathrm{d} \theta} \int\limits_{S} L(\underline{x}, \theta) \, \mathrm{d}\underline{x} = \int\limits_{S} \frac{\partial}{\partial \theta} L(\underline{x}, \theta) \, \mathrm{d}\underline{x} = \int\limits_{S} \frac{\frac{\partial}{\partial \theta} L(\underline{x}, \theta)}{L(\underline{x}, \theta)} L(\underline{x}, \theta) \, \mathrm{d}\underline{x} = \int\limits_{S} \left( \frac{\partial}{\partial \theta} \log L(\underline{x}, \theta) \right) L(\underline{x}, \theta) \, \mathrm{d}\underline{x} \stackrel{\ast}{=} \mathbb{E}_{\theta} \left[ \frac{\partial}{\partial \theta} \log L(\underline{X}, \theta) \right] $.
+
+Per la non distorsione si ha che $ \tau(\theta) = \int\limits_{S} T(\underline{X}) L(\underline{x}, \theta) \, \mathrm{d}\underline{x} \implies \tau'(\theta) = \frac{\mathrm{d}}{\mathrm{d} \theta} \int\limits_{S} T(\underline{X}) L(\underline{x}, \theta) \, \mathrm{d}\underline{x} = \int\limits_{S} T(\underline{X}) \frac{\partial}{\partial \theta} L(\underline{x}, \theta) \, \mathrm{d}\underline{x} \stackrel{\ast \ast}{=} \int\limits_{S} \left( T(\underline{X}) \frac{\partial}{\partial \theta} \log L(\underline{x}, \theta) \right) L(\underline{x}, \theta) \, \mathrm{d}\underline{x} $.
+
+$ \ast\ast - \tau(\theta) \ast \implies \tau'(\theta) = \int\limits_{S} \left[ T(\underline{X}) - \tau(\theta) \right] \left( \frac{\partial}{\partial \theta} \log L(\underline{x}, \theta) \right) L(\underline{x}, \theta) \, \mathrm{d}\underline{x} = \mathbb{E}_{\theta} \left[ \left( T(\underline{X}) - \tau(\theta) \right) \left( \frac{\partial}{\partial \theta} \log L(\underline{x}, \theta) \right) \right] $. Dato che $ \mathbb{E}_{\theta} \left[ T(\underline{X}) - \tau(\theta) \right] = 0 $ perch\'e $ T $ non \`e distorto per $ \tau $ e $ \mathbb{E}_{\theta} \left[ \frac{\partial}{\partial \theta} \log L(\underline{x}, \theta) \right] = 0 $ per $ \ast $ e dato che $ \cov(X, Y) = \mathbb{E} [XY] - \mathbb{E} [X] \mathbb{E}[Y] $ si ha che $ \tau'(\theta) = \cov \left( T(\underline{X}) - \tau(\theta), \frac{\partial}{\partial \theta} \log L(\underline{x}, \theta) \right) $.
+
+Ricordando che se $ X $ e $ Y $ sono v.a., allora $ -1 \le \rho (X, Y) \le 1 $, dove $ \rho (X, Y) = \frac{\cov(X, Y)}{\sqrt{\var(X)\var(Y)}} $ o meglio, elevando al quadrato, $ \frac{\cov^2(X, Y)}{\var(X)\var(Y)} \le 1 $, cio\`e $ \cov^2(X, Y) \le \var(X) \var(Y) $, allora $ \tau'(\theta)^2 = \cov^2 \left( T(\underline{X}) - \tau(\theta), \frac{\partial}{\partial \theta} \log L(\underline{x}, \theta) \right) \le \var \left( T(\underline{X}) - \tau(\theta) \right) \var \left( \frac{\partial}{\partial \theta} \log L(\underline{x}, \theta) \right) $. Tenendo conto che, dalla $ \ast $, $ \mathbb{E}_{\theta} \left[ \frac{\partial}{\partial \theta} \log L(\underline{x}, \theta) \right] $ e che $ \var(X) = \mathbb{E} [X^2] - \mathbb{E}^2[X] $, si ottiene che $ \tau'(\theta)^2 \le \var(T(\underline{X})) \mathbb{E}_{\theta} \left[ \left( \frac{\partial}{\partial \theta} \log L(\underline{x}, \theta) \right)^2 \right] $ , cio\`e $ \var(T(\underline{X})) \ge \frac{\tau'(\theta)^2}{\mathbb{E}_{\theta} \left[ \left( \frac{\partial}{\partial \theta} \log L(\underline{x}, \theta) \right)^2 \right]} $.
+\end{proof}
+
+\begin{oss}
+\noindent
+\begin{itemize}
+\item Si ottiene l'uguaglianza in Cramer-Rao sse $ \rho \left( T(\underline{X}) - \tau(\theta), \frac{\partial}{\partial \theta} \log L(\underline{x}, \theta) \right) = \pm 1 \iff \frac{\partial}{\partial \theta} \log L(\underline{x}, \theta) = A(\theta) [T(\underline{X}) - \tau(\theta)] + B(\theta) $ per un qualche $ A, B $, cio\`e c'è dipendenza lineare, per\`o $ 0 = \mathbb{E}_{\theta} \left[ \frac{\partial}{\partial \theta} \log L(\underline{x}, \theta) \right] = A(\theta) \mathbb{E}_{\theta} [T(\underline{X}) - \tau(\theta)] + B(\theta) $ ma $ T(\underline{X}) $ \`e non distorto per $ \tau $ quindi $ \mathbb{E}_{\theta} [T(\underline{X}) - \tau(\theta)] = 0 \implies B(\theta) = 0 $. Perci\`o, $ T(\underline{X}) $ \`e efficiente per $ \tau(\theta) \iff \exists\ A(\theta) : \frac{\partial}{\partial \theta} \log L(\underline{x}, \theta) = A(\theta)[T(\underline{X}) - \tau(\theta)] $.
+\item Se $ T(\underline{X}) $ \`e efficiente per $ \tau(\theta) $
+
+\[ \var_{\theta} (T(\underline{X})) = \pm \frac{\tau'(\theta)}{A(\theta)} \]
+
+Il segno da scegliere \`e tale per cui $ \var_{\theta} (T(\underline{X})) \ge 0 $.
+
+\begin{proof}
+$ \var_{\theta} (T(\underline{X})) = \frac{\tau'(\theta)^2}{\mathbb{E}_{\theta} \left[ \left( \frac{\partial}{\partial \theta} \log L(\underline{x}, \theta) \right)^2 \right]} = \frac{\tau'(\theta)^2}{\mathbb{E}_{\theta} \left[ A^2(\theta) \left( T(\underline{X}) - \tau(\theta) \right)^2 \right]} $. Dato che $ A^2(\theta) $ \`e una costante rispetto a $ \underline{x} $ si pu\`o portare fuori dal valore atteso:
+
+$ \var_{\theta} (T(\underline{X})) = \frac{\tau'(\theta)^2}{A^2(\theta) \mathbb{E}_{\theta} \left[ \left( T(\underline{X}) - \tau(\theta) \right)^2 \right]} = \frac{\tau'(\theta)^2}{A^2(\theta) \var_{\theta} (T(\underline{X}))} $, per la definzione di varianza. Quindi si ha che $ \var^2_{\theta} (T(\underline{X})) = \frac{\tau'(\theta)^2}{A^2 (\theta)} \implies \var_{\theta} (T(\underline{X})) = \pm \frac{\tau'(\theta)}{A(\theta)} $
+\end{proof}
+\end{itemize}
+\end{oss}
+
+\begin{defn}
+$ I(\theta) \defeq \mathbb{E}_{\theta} \left[ \left( \frac{\partial}{\partial \theta} \log L(\underline{x}, \theta) \right)^2 \right] $ \`e chiamata informazione di Fisher. In particolare, $ \mathbb{E}_{\theta} \left[ \left( \frac{\partial}{\partial \theta} \log L(\underline{x}, \theta) \right)^2 \right] = \mathbb{E}_{\theta} \left[ \left( \frac{\frac{\partial}{\partial \theta} L(\underline{x}, \theta)}{L(\underline{x}, \theta)} \right)^2 \right] $ \`e il valore atteso della velocit\`a relativa della variazione di $ L $ in $ \underline{x} $ rispetto a $ \theta $.
+\end{defn}
+
+\begin{es}
+Dato $ \theta_0 < \theta_1 $:
+
+\begin{figure}[H]
+\begin{tikzpicture}
+	\draw[->] (-1, 0) -- (3, 0);
+	\draw[->] (0, -1) -- (0, 2);
+	\draw[domain=-1:3, smooth,variable=\x, black] plot ({\x}, exp{-(\x - 1)*(\x - 1)});
+	\draw[domain=-1:3, smooth, variable=\x, black] plot ({\x}, exp{-(\x - 1.5)*(\x - 1.5)});
+	\draw[dotted] (1, 1) -- (1, 0);
+	\fill (1,0) node[below] {$ \theta_0 $};
+	\draw[dotted] (1.5, 1) -- (1.5, 0);
+	\fill (1.5,0) node[below] {$ \theta_1 $};
+\end{tikzpicture}
+\caption{Esempio di distribuzione con $ I(\theta) $ piccolo. Se si trasla di poco la curva, i valori cambiano di poco}
+\end{figure}
+
+\begin{figure}[H]
+\begin{tikzpicture}
+	\draw[->] (-1, 0) -- (3, 0);
+	\draw[->] (0, -1) -- (0, 2);
+	\draw[domain=-1:3, smooth,variable=\x, black] plot ({\x}, exp{-15*(\x - 1)*(\x - 1)});
+	\draw[domain=-1:3, smooth, variable=\x, black] plot ({\x}, exp{-15*(\x - 1.5)*(\x - 1.5)});
+	\draw[dotted] (1, 1) -- (1, 0);
+	\fill (1,0) node[below] {$ \theta_0 $};
+	\draw[dotted] (1.5, 1) -- (1.5, 0);
+	\fill (1.5,0) node[below] {$ \theta_1 $};
+\end{tikzpicture}
+\caption{Esempio di distribuzione con $ I(\theta) $ grande. Se si trasla di poco la curva, i valori cambiano di molto}
+\end{figure}
+\end{es}
+
+\begin{oss}
+\noindent
+\begin{itemize}
+\item La disuguaglianza di Cramer-Rao pu\`o cos\`i essere riscritta:
+\[ \var_{\theta} (T(\underline{X})) \ge \frac{\tau'(\theta)^2}{I(\theta)} \]
+\item Nel caso i.i.d. si hanno $ X_1, \dotsc, X_n \sim f(x, \theta) \implies L(\underline{x}, \theta) = \prod\limits_{i = 1}^{n} f(x_i, \theta) $. Sia $ T = T(\underline{X}) $ uno stimatore non distorto per $ \tau(\theta) $ e siano valide le ipotesi della disuguaglianza di Cramer-Rao. Allora
+
+$ 0 = \mathbb{E}_{\theta} \left[ \frac{\mathrm{d}}{\mathrm{d} \theta} \log L(\underline{x}, \theta) \right] \stackrel{\text{i.i.d.}}{=} \mathbb{E}_{\theta} \left[ \frac{\mathrm{d}}{\mathrm{d} \theta} \sum\limits_{i = 1}^{n} \log f(x_i, \theta) \right] = \sum\limits_{i = 1}^{n} \mathbb{E}_{\theta} \left[ \frac{\mathrm{d}}{\mathrm{d} \theta} \log f(x_i, \theta) \right] = n \mathbb{E}_{\theta} \left[ \frac{\mathrm{d}}{\mathrm{d} \theta} \log f(x_i, \theta) \right] $
+
+Quindi $ I(\theta) = \mathbb{E}_{\theta} \left[ \left( \frac{\mathrm{d}}{\mathrm{d} \theta} \log L(\underline{x}, \theta) \right)^2 \right] = \var_{\theta} \left( \frac{\mathrm{d}}{\mathrm{d} \theta} \log L(\underline{x}, \theta) \right) = \var_{\theta} \left( \sum\limits_{i = 1}^{n} \frac{\mathrm{d}}{\mathrm{d} \theta} \log f((x_i), \theta) \right) = \sum\limits_{i = 1}^{n} \var_{\theta} \left( \frac{\mathrm{d}}{\mathrm{d} \theta} \log f((x_i), \theta) \right) \stackrel{\text{i.i.d.}}{=} n \var_{\theta} \left( \frac{\mathrm{d}}{\mathrm{d} \theta} \log f((x_i), \theta) \right) = n \mathbb{E}_{\theta} \left[ \left( \frac{\mathrm{d}}{\mathrm{d} \theta} \log f((x_i), \theta) \right)^2 \right] \eqdef n \tilde{I}(\theta) $
+\end{itemize}
+\end{oss}
+
+\section{Legami tra efficienza e famiglia esponenziale}
+\begin{prop}
+Si suppongano valide le ipotesi della disuguaglianza di Cramer-Rao e sia $ T(\underline{X}) $ uno stimatore efficiente di $ \tau(\theta) $, con $ \theta \in \Theta \subseteq \mathbb{R} $, ovvero $ \exists\ A(\theta) : \frac{\mathrm{d}}{\mathrm{d} \theta} \log L(\underline{x}, \theta) \stackrel{(\ast)}{=} A(\theta) [T(\underline{X}) - \tau(\theta)] $. Si supponga che esistano finiti gli integrali $ \int\limits_{\Theta} A(\theta) \, \mathrm{d}\theta $ e $ \int\limits_{\Theta} \tau(\theta) A(\theta) \, \mathrm{d}\theta $, allora la funzione di verosimiglianza $ L (\underline{x}, \theta) $ appartiene alla famiglia esponenziale, ossia $ L(\underline{x}, \theta) = \underbrace{C(\theta)}_{> 0} e^{Q(\theta) T(\underline{X})} \underbrace{h(\underline{X})}_{h \ne h(\theta)} $ 
+\end{prop}
+
+\begin{proof}
+Integrando $ (\ast) $ si ottiene $ \log L(\underline{x}, \theta) = \int\limits_{\Theta} A(\theta) [T(\underline{X}) - \tau(\theta)] \, \mathrm{d}\theta + K(\underline{X}) = \int\limits_{\Theta} A(\theta) T(\underline{X}) \, \mathrm{d}\theta - \int\limits_{\Theta} A(\theta) \tau(\theta) \, \mathrm{d}\theta + K(\underline{X}) \implies $
+
+\[ L(\underline{x}, \theta) = e^{T(\underline{X}) \overbrace{\int\limits_{\Theta} A(\theta) \, \mathrm{d}\theta}^{Q(\theta)}} - \underbrace{e^{\int\limits_{\Theta} A(\theta) \tau(\theta) \, \mathrm{d}\theta}}_{C(\theta)} + \underbrace{e^{K(\underline{X})}}_{h(\underline{X})} \]
+\end{proof}
+
+\section{Unicit\`a degli stimatori efficienti}
+\begin{prop}
+Siano soddisfatte le ipotesi della disuguaglianza di Cramer-Rao e siano $ T_{1}^{\ast} = T_{1} (\underline{X}) $ e $ T_{2}^{\ast} = T_{2} (\underline{X}) $ due stimatori efficienti di $ \tau(\theta) $, allora $ T_{1}^{\ast} = T_{2}^{\ast} $ q.c.
+\end{prop}
+
+\begin{proof}
+Si consideri $ T^{\ast \ast} = \frac{1}{2} (T_{1}^{\ast} + T_{2}^{\ast}) $. Si sa che $ \var_{\theta} (T_{1}^{\ast}) = \var_{\theta} (T_{2}^{\ast}) = \frac{\tau'(\theta)^2}{I(\theta)} $, quindi $ \var_{\theta} (T^{\ast\ast}) = \frac{1}{4} \left( \var_{\theta} (T_{1}^{\ast}) + \var_{\theta} (T_{2}^{\ast}) + 2 \cov(T_{1}^{\ast}, T_{2}^{\ast}) \right) $. Tenendo conto che $ \cov(T_{1}^{\ast}, T_{2}^{\ast}) = \frac{\cov(T_{1}^{\ast}, T_{2}^{\ast})}{\sqrt{\var_{\theta} (T_{1}^{\ast}) \var_{\theta} (T_{2}^{\ast})}} \sqrt{\var_{\theta} (T_{1}^{\ast}) \var_{\theta} (T_{2}^{\ast})} = \rho (T_{1}^{\ast}, T_{2}^{\ast}) \sigma^{2} $, si ha che $ \var_{\theta} (T^{\ast\ast}) = \frac{\sigma^{2}}{2} \left(1 + \rho (T_{1}^{\ast}, T_{2}^{\ast}) \right) $.
+
+Se $ \rho < 1 $ si ha che $ \var_{\theta} (T^{\ast\ast}) < \sigma^{2} $ ma $ \mathbb{E}_{\theta} [T^{\ast \ast}] = \frac{1}{2} \left( \mathbb{E}_{\theta} [T_{1}^{\ast}] + \mathbb{E}_{\theta} [T_{2}^{\ast}] \right) $, che, per la non distorsione, si ha che \`e uguale a $ \tau(\theta) $. \Lightning
+
+$ \rho = 1 \implies \exists\ \alpha, \beta : T_{1}^{\ast} = \alpha + \beta T_{2}^{\ast} $ q.c. $ \implies \begin{cases} \mathbb{E}_{\theta} [T_{1}^{\ast}] = \alpha + \beta \mathbb{E}_{\theta} [T_{2}^{\ast}] \\ \var_{\theta} (T_{1}^{\ast}) = \beta^2 \var_{\theta} (T_{2}^{\ast}) \end{cases} \implies \begin{cases} \alpha = 0 \\ \beta = 1 \end{cases} \implies T_{1}^{\ast} \equiv T_{2}^{\ast} $
+\end{proof}
+
+\section{Asintotica normalit\`a}
+
+\begin{prop}
+Sia $ \underline{X} = (X_1, \dotsc, X_n) $ campione iid con $ \underline{X} \sim f(\underline{x}, \theta) $, con $ \theta \in \Theta \subseteq \mathbb{R} $. Siano soddisfatte le ipotesi della disuguaglianza di Cramer-Rao e sia $ T(\underline{X}) $ uno stimatore efficiente per $ \theta $. Allora $ T(\underline{X}) \sim AN \left( \theta, \frac{1}{I_{n} (\theta)} \right) $, ovvero
+
+\[ \sqrt{I_{n} (\theta)} (T(\underline{X}) - \theta) \stackrel{d}{\to} N(0,1) \]
+\end{prop}
+
+\begin{proof}
+Dato che $ T(\underline{X}) $ \`e efficiente allora $ \exists\ A(\theta): \frac{\mathrm{d}}{\mathrm{d} \theta} \log L(\underline{x}, \theta) = A(\theta) [T(\underline{X}) - \theta], \mathbb{P}_{\theta} $ q.c., $ \forall\ \theta $.
+
+Si supponga che $ A(\theta) > 0 $ e sia $ \mu_{\theta} (\underline{x}) = \frac{\mathrm{d}}{\mathrm{d} \theta} \log L(\underline{x}, \theta) $, allora $ \mathbb{E}_{\theta} [\mu_{\theta} (\underline{x})] = 0, \forall\ \theta \implies T(\underline{X}) = \frac{1}{A(\theta)} \mu_{\theta}(\underline{x}) + \theta $
+
+Allora $ \var_{\theta} (T(\underline{X})) = \frac{1}{A^2(\theta)} \var_{\theta} (\mu_{\theta}(\underline{x})) = \frac{1}{A^2(\theta)} \mathbb{E}_{\theta} [\mu_{\theta}(\underline{x})] = \frac{1}{A^2(\theta)} I_{n} (\theta) $. Perci\`o, normalizzando $ T $ si ottiene
+
+\[ \frac{T(\underline{X}) - \theta}{\sigma^2} = \frac{T(\underline{X}) - \theta}{\sqrt{\frac{I_n(\theta)}{A^2(\theta)}}} = \frac{\frac{\mu_{\theta}(\underline{x})}{\cancel{A(\theta)}}}{\frac{\sqrt{I_n(\theta)}}{\cancel{A(\theta)}}} \stackrel{\text{i.i.d.}}{=} \frac{\sum\limits_{i = 1}^{n} \tilde{u}_{\theta} (x_i)}{\sqrt{n \tilde{I}_{n} (\theta)}} \]
+
+dove $ \tilde{u}_{\theta} (x_i) = \frac{\mathrm{d}}{\mathrm{d} \theta} \log f(x_i, \theta) $ e $ \tilde{I}_{n} (\theta) $ \`e l'informazione di Fisher relativa alla densit\`a di probabilit\`a.
+
+Tenendo conto che $ \mathbb{E}_{\theta} [\tilde{u}_{\theta} (x_i)] = 0, \forall\ i $, e che quindi $ \var_{\theta} (\tilde{u}_{\theta} (x_i)) = \mathbb{E}_{\theta} [(\tilde{u}_{\theta} (x_i))^2] = \tilde{I}_{n} (\theta) $, e che a numeratore, dividendo per $ n $ si ottiene la media campionaria degli $ \tilde{u}_{\theta} (x_i) $, si ha che 
+
+\[ \frac{\sum\limits_{i = 1}^{n} \tilde{u}_{\theta} (x_i)}{\sqrt{n \tilde{I}_{n} (\theta)}} = \frac{\frac{1}{n} \sum\limits_{i = 1}^{n} \tilde{u}_{\theta} (x_i)}{\frac{1}{n} \sqrt{n \tilde{I}_{n} (\theta)}} = \frac{\overline{u}}{\sqrt{\frac{\tilde{I}_{n} (\theta)}{n}}} = \frac{\overline{u} - 0}{\sqrt{\var_{\theta} (\overline{u})}} \stackrel{d}{\to} N(0, 1) \]
+
+per il teorema del limite centrale.
+\end{proof}
+
+\begin{defn}
+\noindent
+\begin{itemize}
+\item Chi quadro: 
+\begin{itemize}
+\item $ X \sim N(0,1) \implies Y = X^2 \sim \chi^2_{1} $
+\item Se $ X_1 \sim \chi^{2}_{r_1} $ e $ X_2 \sim \chi^{2}_{r_2} $ allora $ Y = X_1 + X_2 = \chi^{2}_{r_1 + r_2} $
+\end{itemize}
+\item $ T $ di Student: se $ X \sim N(0,1) $ e $ Y \sim \chi^{2}_{r} $ indipendenti tra loro, allora $ T = \frac{X}{\sqrt{\frac{Y}{r}}} \sim t_{r} $
+\item $ F $ di Fisher: se $ X \sim \chi^{2}_{r_1} $ e $ Y \sim \chi^{2}_{r_2} $ indipendenti tra loro, allora $ \mathcal{F} = \frac{\frac{X}{r_1}}{\frac{Y}{r_2}} \sim F_{r_1, r_2} $
+\end{itemize}
+\end{defn}
+
+\begin{oss}
+La $ T $ di Student e la $ F $ di Fisher sono correlate, in particolare il quadrato della $ T $ \`e una $ F $ di Fisher a parametri $ 1, r $.
+
+\begin{proof}
+$ T^{2} = \frac{X^2}{\frac{Y}{r}} = \frac{\frac{\chi^{2}_{1}}{1}}{\frac{\chi^{2}_{r}}{r}} = F_{1, r} $ in quanto numeratore e denominatore sono indipendenti tra loro.
+\end{proof}
+\end{oss}
+
+\section{Verifica di ipotesi}
+Sia $ \underline{X} = (X_1, \dotsc, X_n) $ campione con funzione di verosimiglianza $ L(\underline{x}, \theta) $, con $ \theta \in \mathcal{H} $.
+ 
+\begin{defn}
+Un'ipotesi statistica \`e un'affermazione riguardante la distribuzione di probabilit\`a di una o pi\`u variabili. Se l'ipotesi specifica univocamente la distribuzione allora si tratta di un'ipotesi semplice, altrimenit di dice che \`e un'ipotesi composta.
+\end{defn}
+
+\begin{es}	\label{es:1}
+\noindent
+\begin{itemize}
+\item Un'azienda farmaceutica ha sviluppato un nuovo farmaco per l'innalzamento della pressione sanguigna e vuole sapere se conviene cambiare il processo di produzione per produrre il nuovo farmaco. Sia quindi $ X \sim N(\theta, \sigma^2) $, con $ \theta $ incognito e $ \sigma^2 $ nota, la distribuzione dela velocit\`a media di aumento della pressione sanguigna. L'azienda dovr\`a quindi scegliere tra le due opzioni:
+
+\begin{itemize}
+\item $ H_0 $: $ \theta = \theta_0 $, ovvero la velocit\`a media del nuovo farmaco \`e uguale a quello gi\`a in produzione. Risulta essere un'ipotesi semplice
+\item $ H_1 $: $ \theta > \theta_0 $, ovvero la velocit\`a media del nuovo farmaco \`e maggiore a quello gi\`a in produzione. Risulta essere un'ipotesi composta
+\end{itemize} 
+\item Sia $ X_1, \dotsc, X_n \sim F $ cdf:
+\begin{itemize}
+\item $ H_0 $: $ F = F_0 $ (nota). \`E un'ipotesi semplice
+\item $ H_1 $: $ F \ne F_0 $ (nota). \`E un'ipotesi composta
+\end{itemize}
+\end{itemize}
+\end{es}
+
+\begin{defn}
+$ H_0 $ viene chiamata ipotesi nulla mentre $ H_1 $ viene chiamata ipotesi alternativa.
+\end{defn}
+
+\begin{defn}
+Viene definito errore del primo tipo quando viene rigettata $ H_0 $ mentre $ H_0 $ \`e vera. Viene definito errore del secondo tipo quando viene rigettata $ H_1 $ mentre $ H_1 $ \`e vera.
+\end{defn}
+
+Un errore del primo tipo \`e pi\`u grave di un errore del secondo tipo. Infatti, nel primo caso dell'esempio \ref{es:1}, se si commette un errore del primo tipo si cambia la produzione per produrre il nuovo farmaco mentre quello vecchio era migliore, mentre se si commette un errore del secondo tipo non ci sono peggioramenti ma nemmeno miglioramenti dato che il nuovo farmaco, migliore di quello in produzione, non viene cos\`i prodotto.
+ 
+\begin{defn}
+Il criterio di verifica \`e una regola che permette di scegliere tra $ H_0 $ e $ H_1 $ sulla base della realizzazione del campione $ \underline{x} = (x_1, \dotsc, x_n) $, ovvero definisce una regione $ C \subseteq \mathbb{R}^{n} : \begin{cases} \text{rigetto } H_0 & \underline{x} \in C \\ \text{accetto } H_0 & \underline{x} \not\in C \end{cases} $
+
+$ C $ \`e cos\`i detta regione critica del test. Per determinare $ C $ si impone che:
+
+\[ \sup\limits_{\theta \in \mathcal{H}_{0}} \mathbb{P}_{\theta} (\text{rigetto } H_0 \vert H_0 \text{ vera}) = \sup\limits_{\theta \in \mathcal{H}_{0}} \mathbb{P}_{\theta} (\underline{x} \in C \vert H_0 \text{ vera}) \le \alpha \]
+
+con $ \alpha $, chiamato significativit\`a del test, definito a priori (solitamente vale $ 0.01 $, $ 0.05 $ o $ 0.1 $)
+\end{defn}
+
+Questa tabella riassume gli errori con la definizione di regione critica:
+
+\begin{center}
+\begin{tabular}{c|c|c|}
+	 & $ H_0 $ vera & $ H_0 $ falsa \\
+\hline
+	\shortstack[c]{rigetto $ H_0 $ \\ $ \underline{x} \in C $} & \shortstack[c]{Errore del \\ primo ordine} & \shortstack[c]{Nessun \\ errore} \\
+\hline
+	\shortstack[c]{accetto $ H_0 $ \\ $ \underline{x} \not\in C $} & \shortstack[c]{Nessun \\ errore} & \shortstack[c]{Errore del \\ secondo ordine} \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{es}
+Viene rigettata $ H_0 $ se $ \overline{X}_{n} = \frac{1}{n} \sum\limits_{i = 1}^{n} X_i $, che \`e uno stimatore di $ \theta $, \`e maggiore a $ \theta_0 $. 
+
+\[ C = \left\{ \underline{x} \in \mathbb{R}^{n} : \frac{1}{n} \sum\limits_{i = 1}^{n} x_i > \theta_0 \right\} \]
+
+Quindi $ \mathbb{P}_{\theta} (\text{commetto un errore del primo tipo}) = \mathbb{P}_{\theta} (\text{rigetto } H_{0} \vert H_{0} \text{ vera}) = \mathbb{P}_{\theta_{0}} (\overline{X}_{n} > \theta_{0}) $. Dato che $ X_{1}, \dotsc, X_n \sim N(\theta, \sigma^{2}) $, allora $ \overline{X}_{n} \stackrel{H_0}{\sim} N(\theta_{0}, \frac{\sigma^{2}}{n}) $ e quindi $ \mathbb{P}_{\theta_{0}} (\overline{X}_{n} > \theta_{0}) = \frac{1}{2} $.
+
+Piccoli discostamenti da $ \theta_{0} $ e tenendo conto che un errore del primo tipo \`e molto grave non possono dire che $ H_0 $ sia falsa e quindi si assume $ H_0 $ vera.
+
+Si consideri ora la seguente regione critica del test:
+
+\[ C = \left\{ \underline{x} \in \mathbb{R}^{n} : \frac{1}{n} \sum\limits_{i = 1}^{n} x_i > c \gg \theta_0 \right\} \]
+
+$ \alpha = \sup\limits_{\theta \in \mathcal{H}_0} \mathbb{P}_{\theta} (\text{commetto un errore del primo tipo}) = \mathbb{P}_{\theta_{0}} (\text{commetto un errore del primo tipo}) = \mathbb{P}_{\theta_{0}} (\underline{x} \in C) = \mathbb{P}_{\theta_{0}} (\overline{X}_{n} > c) $. $ \overline{X}_{n} \stackrel{H_{0}}{\sim} N(\theta_{0}, \frac{\sigma^{2}}{n}) $ e bisognerebbe ricorrere alle particolari tavole. In alternativa, si pu\`o normalizzare la v.a.
+
+$ \alpha = \mathbb{P}_{\theta_{0}} (\overline{X}_{n} > c) = \mathbb{P}_{\theta_{0}} \left( \underbrace{\frac{\overline{X}_{n} - \theta_{0}}{\frac{\sigma}{\sqrt{n}}}}_{\sim N(0,1)} > \underbrace{\frac{c - \theta_{0}}{\frac{\sigma}{\sqrt{n}}}}_{= c_{\alpha}} \right) = 1 - F_{N(0,1)} (c_{\alpha}) $
+
+$ \implies F_{N(0,1)} (c_{\alpha}) = 1 - \alpha \implies c_{\alpha} = F^{-1}_{N(0,1)} (1 - \alpha) $. $ F_{N(0,1)}^{-1} $ non ha una sua forma algebrica quindi bisogna usare le tavole per calcolarne il valore, tuttavia \`e la cumulativa di una $ N(0,1) $.
+
+\begin{figure}[H]
+\begin{tikzpicture}
+	\draw[->] (-1, 0) -- (4.2, 0);
+	\draw[->] (0, -1) -- (0, 2);
+	\draw[domain=-1:4, smooth, variable=\x, black] plot ({\x}, exp{-(\x - 2)*(\x - 2)});
+	\draw[dotted] (2, 1) -- (2, 0);
+	\fill (2, 0) node[below] {$ \theta_0 $};
+
+	\draw[dotted] (2.5, 0.7788) -- (2.5, 0);
+	\fill (2.5, 0) node[below] {$ c $};
+
+	\filldraw[pattern=north east lines, pattern color=black!20, domain=2.5:4, smooth, variable=\x] plot ({\x}, exp{-(\x - 2)*(\x - 2)}) -| (2.5, 0) -- cycle;
+	\draw (2.8, 0.2) node {$ \alpha $};
+\end{tikzpicture}
+% \caption{}
+\end{figure}
+
+Da $ c_{\alpha} $ si ricava, a ritroso, il valore di $ c $:
+
+\[ c = \theta_{0} + c_{\alpha} \frac{\sigma}{\sqrt{n}} \]
+
+e quindi $ C = \left\{ \underline{x} \in \mathbb{R}^{n} : \frac{1}{n} \sum\limits_{i = 1}^{n} x_i > \theta_{0} + c_{\alpha} \frac{\sigma}{\sqrt{n}} \right\} $ \`e la regione critica di livello (di significativit\`a) di $ \alpha $.
+\end{es}
+
+\begin{defn}
+$ F^{-1}_{N(0,1)} (1 - \alpha) $ viene chiamato valore critico a livello $ 1 - \alpha $ di $ N(0,1) $.
+\end{defn}
+
+\begin{defn}
+Una funzione potenza \`e una funzione associata alla regione critica $ C $ di un test definita da:
+\begin{align*}
+k: & \mathcal{H} \to [0, 1] \\
+  & \theta \mapsto k(\theta) = \mathbb{P}_{\theta} (\underline{x} \in C)
+\end{align*}
+
+Quindi:
+\begin{itemize}
+\item Se $ \theta \in \mathcal{H}_{0} $, allora $ k(\theta) = \mathbb{P}_{\theta} (\text{commetto un errore del primo tipo}) \le \alpha $;
+\item Se $ \theta \in \mathcal{H}_{1} $, allora $ 1 - k(\theta) = \mathbb{P}_{\theta} (\text{commetto un errore del secondo tipo}) \le \alpha $
+\end{itemize}
+\end{defn}
+
+\begin{defn}
+Un test di livello $ \alpha $ per verificare
+\begin{itemize}
+\item $ H_0 $: $ \theta \in \mathcal{H}_{0} $
+\item $ H_0 $: $ \theta \in \mathcal{H}_{1} $
+\end{itemize}
+
+dove:
+\begin{itemize}
+\item $ \mathcal{H}_{0} \cup \mathcal{H}_{1} = \mathcal{H} $
+\item $ \mathcal{H}_{0} \cap \mathcal{H}_{1}  = \varnothing $
+\end{itemize}
+
+basato su un campione $ X_{1}, \dotsc, X_{n} $ con funzione di verosimiglianza $ L(\underline{x}, \theta) $ \`e una funzione
+
+\[ \phi: \mathbb{R}^{n} \to I = \{ 0, 1 \} \]
+
+dove $ I $ \`e l'insieme degli indici di $ \mathcal{H}_{i} $, definita da:
+
+\[ \underline{x} \mapsto \phi(\underline{x}) = \begin{cases} 1 & \underline{x} \in C \subseteq \mathbb{R}^{n} \\ 0 & \text{altrimenti} \end{cases} \]
+
+con $ \sup\limits_{\theta \in \mathcal{H}_{0}} \mathbb{P}_{\theta} (\underline{x} \in C) = \sup\limits_{\theta \in \mathcal{H}_{0}} k(\theta) $
+\end{defn}
+
+In caso di parit\`a scelgo il test con $ \alpha $ maggiore.
+
+\begin{defn}
+Un test di livello $ \alpha $ che massimizzi la potenza per $ \theta \in \mathcal{H}_{1} $ tra tutti i testi di livello $ \alpha $ \`e detto uniformemente pi\`u potente (UMP, \emph{Uniformly more powerful}).
+\end{defn}
+
+Dunque $ \phi $ \`e un test UMP di livello $ \alpha $ se:
+\begin{enumerate}
+\item $ \sup\limits_{\theta \in \mathcal{H}_{0}} k_{\phi} (\theta) = \alpha $;
+\item $ \forall\ \phi' $ test che soddisfa il primo punto si ha, $ \forall\ \theta \in \mathcal{H}_{1} $:
+\[ k_{\phi} (\theta) \ge k_{\phi'} (\theta) \] 
+\end{enumerate}
+
+\begin{defn}
+Se $ \mathcal{H}_{1} = \{ \theta \} $, allora si dice che il test \`e solo pi\`u potente. Per essere uniformemente pi\`u potente la cardinali\`a di $ \mathcal{H}_{1} $ deve essere maggiore di $ 1 $.
+\end{defn}
+
+\begin{defn}
+La regione critica associata ad un test UMP si dice migliore regione critica.
+\end{defn}
+
+\begin{es}
+Siano $ X_{1}, \dotsc, X_{n} \sim N(\theta, \sigma^{2}) $ e si consideri le ipotesi
+\begin{itemize}
+\item $ H_{0}: \theta = \theta_{0} $
+\item $ H_{1}: \theta \ne \theta_{0} $
+\end{itemize}
+
+La regione critica per questo test \`e $ C = \left\{ \underline{x} \in \mathbb{R}^{n} : \overline{X}_{n} > \underbrace{\theta_{0} + c_{\alpha} \frac{\sigma}{\sqrt{n}}}_{c} \right\} $.
+
+Quindi $ k_{\phi} (\theta) = \mathbb{P}_{\theta} (\underline{x} \in C) = prob(\underbrace{\overline{X}_{n}}_{\sim N \left( \theta, \frac{\sigma^{2}}{n} \right) } > c) = prob \left( \underbrace{\frac{\overline{X}_{n} - \theta}{\frac{\sigma}{\sqrt{n}}}}_{\sim N(0,1)} > \frac{c - \theta}{\frac{\sigma}{\sqrt{n}}} \right) = 1 - F_{N(0,1)} \left( \frac{c - \theta}{\frac{\sigma}{\sqrt{n}}} \right) = 1 - F_{N(0,1)} \left( \frac{\theta_{0} - \theta}{\frac{\sigma}{\sqrt{n}}} + c_{\alpha} \right) $
+
+% TODO: grafico
+
+Infatti, se $ \theta = \theta_{0} $ allora $ k_{\theta} = 1 - F_{N(0,1)} (c_{\alpha}) = 1 - (1 - \alpha) = \alpha $.
+\end{es}
+
+\section{Test d'ipotesi}
+Si considerino ora i seguenti casi:
+
+\subsection{Ipotesi semplice contro ipotesi semplice}
+Sia $ \underline{X} = (X_{1}, \dotsc, X_{n}) $ un campione con funzione di verosimiglianza $ L(\underline{x}, \theta) $ con $ \theta \in \Theta = \{ \theta_{0}, \theta_{1} \} $.
+Si consideri quindi le seguenti ipotesi:
+\begin{itemize}
+\item $ H_{0}: \theta = \theta_{0} $, ovvero $ \theta \in \mathcal{H}_{0} = \{ \theta_{0} \} $
+\item $ H_{1}: \theta = \theta_{1} $, ovvero $ \theta \in \mathcal{H}_{1} = \{ \theta_{1} \} $
+\end{itemize}
+
+Per questo caso viene usato il seguente lemma:
+\begin{lem}[Neymann-Pearson]
+Si voglia verificare il test di cui sopra a livello $ \alpha $. Se esiste $ k \in \mathbb{R}^{+} $ e $ C \subseteq \mathbb{R}^{n} $ tale che:
+\begin{enumerate}
+\item $ \mathbb{P}_{\theta_{0}} (\underline{x} \in C) = \alpha $
+\item \noindent
+\begin{itemize}
+\item $ \forall\ \underline{x} \in C, \frac{L(\underline{x}, \theta_{0})}{L(\underline{x}, \theta_{1})} \le k $
+\item $ \forall\ \underline{x} \in \compl{C}, \frac{L(\underline{x}, \theta_{0})}{L(\underline{x}, \theta_{1})} > k $
+\end{itemize}
+\end{enumerate}
+allora $ C $ \`e la migliore regione critica a livello $ \alpha $ e il testo ad esso associato \`e UMP.
+\end{lem}
+
+\begin{proof}
+La dimostrazione viene fatta nel caso continuo. Per dimostrare il lemma nel caso discreto, basta modificare gli integrali in sommatorie.
+
+Sia $ A $ un'altra regione critica di livello $ \alpha $, ovvero $ \mathbb{P}_{\theta_{0}} (\underline{x} \in A) = \alpha $. La tesi da dimostrare \`e che $ \mathbb{P}_{\theta_{1}} (\underline{x} \in C) \ge \mathbb{P}_{\theta_{1}} (\underline{x} \in A) $, ovvero $ \mathbb{P}_{\theta_{1}} (\underline{x} \in C) - \mathbb{P}_{\theta_{1}} (\underline{x} \in A) \ge 0$.
+
+Si consideri la differenza $ \mathbb{P}_{\theta_{1}} (\underline{x} \in C) - \mathbb{P}_{\theta_{1}} (\underline{x} \in A) = \int\limits_{C} L(\underline{x}, \theta_{1}) \, \mathrm{d}\underline{x} - \int\limits_{A} L(\underline{x}, \theta_{1}) \, \mathrm{d}\underline{x} = (\ast) $.
+
+Considerando che:
+\begin{itemize}
+\item $ C = (C \cap A) \cup^{\ast} (C \cap \compl{A}) $
+\item $ A = (C \cap A) \cup^{\ast} (\compl{C} \cap A) $ 
+\end{itemize}
+
+si ha che:
+
+\begin{dmath*} (\ast) = \cancel{\int\limits_{C \cap A} L(\underline{x}, \theta_{1}) \, \mathrm{d}\underline{x}} + \int\limits_{\underbrace{C \cap \compl{A}}_{\subseteq C}} L(\underline{x}, \theta_{1}) \, \mathrm{d}\underline{x} - \cancel{\int\limits_{C \cap A} L(\underline{x}, \theta_{1}) \, \mathrm{d}\underline{x}} - \int\limits_{\underbrace{\compl{C} \cap A}_{\subseteq \compl{C}}} L(\underline{x}, \theta_{1}) \, \mathrm{d}\underline{x} \stackrel{2.}{\ge} \frac{1}{k} \int\limits_{C \cap \compl{A}} L(\underline{x}, \theta_{0}) \, \mathrm{d}\underline{x} - \frac{1}{k} \int\limits_{\compl{C} \cap A} L(\underline{x}, \theta_{0}) \, \mathrm{d}\underline{x} = \frac{1}{k} \int\limits_{C \cap \compl{A}} L(\underline{x}, \theta_{0}) \, \mathrm{d}\underline{x} + \frac{1}{k} \int\limits_{C \cap A} L(\underline{x}, \theta_{0}) \, \mathrm{d}\underline{x} - \frac{1}{k} \int\limits_{\compl{C} \cap A} L(\underline{x}, \theta_{0}) \, \mathrm{d}\underline{x} - \frac{1}{k} \int\limits_{C \cap A} L(\underline{x}, \theta_{0}) \, \mathrm{d}\underline{x} = \frac{1}{k} \left( \int\limits_{C} L(\underline{x}, \theta_{0}) \, \mathrm{d}\underline{x} - \int\limits_{A} L(\underline{x}, \theta_{0}) \, \mathrm{d}\underline{x} \right)
+\end{dmath*}
+
+Essendo $ A $ e $ C $ due regioni critiche di livello $ \alpha $ si ha infine che
+
+\begin{dmath*}
+\mathbb{P}_{\theta_{1}} (\underline{x} \in C) - \mathbb{P}_{\theta_{1}} (\underline{x} \in A) \ge \frac{1}{k} \left( \int\limits_{C} L(\underline{x}, \theta_{0}) \, \mathrm{d}\underline{x} - \int\limits_{A} L(\underline{x}, \theta_{0}) \, \mathrm{d}\underline{x} \right) =  \frac{1}{k} \left( \mathbb{P}_{\theta_{0}} (\underline{x} \in C) - \mathbb{P}_{\theta_{0}} (\underline{x} \in A) \right) = \frac{1}{k} (\alpha - \alpha) = 0 
+\end{dmath*}
+\end{proof}
+
+\begin{es}
+Siano $ X_{1}, \dotsc, X_{n} $ iid $ \sim N(\theta, 1) $ e si consideri le seguenti ipotesi:
+\begin{itemize}
+\item $ H_{0}: \theta = \theta_{0} $
+\item $ H_{1}: \theta = \theta_{1} $
+\end{itemize}
+
+Cerchiamo $ k $ tale che il rapporto di verosimiglianza $ R \defeq \frac{L(\underline{x}, \theta_{0})}{L(\underline{x}, \theta_{1})} $ sia non superiore a $ k, \forall\ \underline{x} \in C \subseteq \mathbb{R}^{n} $
+
+$ R = \frac{L(\underline{x}, \theta_{0})}{L(\underline{x}, \theta_{1})} = \frac{\cancel{\left( \frac{1}{2 \pi} \right)^{\frac{n}{2}}} \exp \left( - \frac{1}{2} \sum\limits_{i = 1}^{n} (x_{i} - \theta_{0})^{2} \right)}{\cancel{\left( \frac{1}{2 \pi} \right)^{\frac{n}{2}}} \exp \left( - \frac{1}{2} \sum\limits_{i = 1}^{n} (x_{i} - \theta_{1})^{2} \right)} \le k \iff \log R \le \log k $
+
+Quindi, considerato che $ C = \{ \underline{x} \in \mathbb{R}^{n} : R(\underline{x}) \le k \} $, si ha che
+
+$ \log R = \frac{1}{2} \sum\limits_{i = 1}^{n} (x_{i} - \theta_{1})^{2} - (x_{i} - \theta_{0})^{2} = \sum\limits_{i = 1}^{n} 2 x_{i} (\theta_{0} - \theta_{1}) + \theta_{1}^{2} - \theta_{0}^{2} = 2 n \overline{x}_{n} \underbrace{(\theta_{0} - \theta_{1})}_{< 0} + n (\theta_{1}^{2} - \theta_{0}^{2}) \le \log k \implies \overline{x}_{n} \ge \frac{2 \log k - n(\theta_{1}^{2} - \theta_{0}^{2}}{2 n (\theta_{0} - \theta_{1})} \eqdef c $
+
+Applicando il lemma di Neymann-Pearson si ha che $ \alpha = \mathbb{P}_{\theta_{0}} (\underline{x} \in C) = \mathbb{P}_{\theta_{0}} (\overline{X}_{n} \ge c) $. Dato che $ \overline{X}_{n} \stackrel{H_{0}}{\simeq} N \left( \theta_{0}, \frac{1}{n} \right) $ si ottiene standardizzando che $ \alpha = \mathbb{P}_{\theta_{0}} \left( \underbrace{\frac{\overline{X}_{n} - \theta_{0}}{\sqrt{\frac{1}{n}}}}_{\simeq N(0, 1)} \ge \underbrace{\frac{c - \theta_{0}}{\sqrt{\frac{1}{n}}}}_{\eqdef \tilde{c}} \right) = 1 - F_{N(0,1)} (\tilde{c}) \implies \tilde{c} = F_{N(0,1)}^{-1} (1 - \alpha) $
+\end{es}
+
+\begin{oss}
+La regione critica $ C = \{ \underline{x} \in \mathbb{R}^{n} : R(\underline{x}) \le k \} = \{ \underline{x} \in \mathbb{R}^{n} : \overline{X}_{n} \ge c \} = \{ \underline{x} \in \mathbb{R}^{n} : \overline{X}_{n} \ge \theta_{0} + c_{1} \sqrt{\frac{1}{n}} \} $ ($ \{ \underline{x} \in \mathbb{R}^{n} : \overline{X}_{n} \ge \theta_{0} + c_{1} \sqrt{\frac{1}{n}} \} $ nel caso $ \theta_{0} > \theta_{1} $) \`e indipendente da $ \theta_{1} $.
+\end{oss}
+
+\subsection{Ipotesi semplice contro ipotesi composta}
+Siano $ X_{1}, \dotsc, X_{n} \sim N(\theta, 1) $ e si abbiano le seguenti ipotesi:
+\begin{itemize}
+\item $ H_{0} : \theta = \theta_{0} $
+\item $ H_{1} : \theta > \theta_{0} $ ($ \theta < \theta_{0} $)
+\end{itemize}
+
+\begin{defn}
+L'ipotesi $ H_{1} $ \`e detta essere ipotesi composta unilaterale perch\'e misurabile solo da un lato. Il suo opposto \`e "bilaterale". 
+\end{defn}
+
+Si scelga $ \theta_{1} > \theta_{0} $ ($ \theta_{1} < \theta_{0} $) e si verifichi quindi
+
+\begin{itemize}
+\item $ H_{0} : \theta = \theta_{0} $
+\item $ H_{1} : \theta = \theta_{1} $
+\end{itemize}
+
+Si applica lo stesso procedimento del caso precedente e si ottiene che il test che usa la regione critica $ C = \left\{ \underline{x} \in \mathbb{R}^{n} : \overline{X}_{n} \ge \theta_{0} + c_{1} \sqrt{\frac{1}{n}} \right\} $ ($ \left\{ \underline{x} \in \mathbb{R}^{n} : \overline{X}_{n} \le \theta_{0} - c_{1} \sqrt{\frac{1}{n}} \right\} $) \`e pi\`u potente, $ \forall\ \theta_{1} > \theta_{0} (\theta_{1} > \theta_{0}) $, da cui si ricava che il test \`e UMP $ \forall\ \theta_{1} \in \mathcal{H}_{1} $.
+
+\begin{es}
+Siano $ X_{1}, \dotsc, X_{n} \sim N(\theta, 1) $ e si testano le seguenti ipotesi:
+\begin{itemize}
+\item $ H_{0} : \theta = \theta_{0} $
+\item $ H_{1} : \theta \ne \theta_{0} $ (ipotesi composta bilaterale)
+\end{itemize}
+
+Si scelga $ \theta_{1} \ne \theta_{0} $ e si verifichi $ H_{0} : \theta = \theta_{0} $ contro $ H_{1} : \theta = \theta_{1} $.
+
+$ \frac{L(\theta_{0})}{L(\theta_{1})} \le k $. Passando ai logaritmi si ottiene:
+\[ \log \left( \frac{L(\theta_{0})}{L(\theta_{1})} \right) \le \log k \implies (\theta_{1} - \theta_{0}) \sum\limits_{i = 1}^{n} X_{i} \ge \frac{n}{2} (\theta_{1} - \theta_{0}) - \log k \]
+
+$ \implies \begin{cases} \sum\limits_{i = 1}^{n} X_{i} \ge \underbrace{frac{n}{2} (\theta_{1} + \theta_{0}) - \frac{\log k}{\theta_{1} - \theta_{0}}}_{\eqdef c_{1}} & \theta_{1} > \theta_{0} \\ \sum\limits_{i = 1}^{n} X_{i} \le \underbrace{\frac{n}{2} (\theta_{1} + \theta_{0}) - \frac{\log k}{\theta_{1} - \theta_{0}}}_{\eqdef c_{2}} & \theta_{1} < \theta_{0} \end{cases} $ da cui si ricava che la ragione critica dipende da $ \theta_{1} $ e quindi non si pu\`o determinare un test UMP.
+
+Infatti $ C = \{ \underline{x} \in \mathbb{R}^{n} : \overline{X}_{n} < c_{1} \lor \overline{X}_{n} > c_{2} \} $ ed essendo un test a livello $ \alpha $ si ha che $ \alpha = \mathbb{P}_{\theta_{0}} (x \in C) = \mathbb{P}_{\theta_{0}} (\overline{X}_{n} < c_{1} \lor \overline{X}_{n} > c_{2}) = \mathbb{P}_{\theta_{0}} \left( \underbrace{\frac{\overline{X}_{n} - \theta_{0}}{\sqrt{\frac{1}{n}}}}_{\stackrel{H_{0}}{\simeq} N(0,1)} < \underbrace{\frac{c_{1} - \theta_{0}}{\sqrt{\frac{1}{n}}}}_{\eqdef \tilde{c}_{1}} \right) + \mathbb{P}_{\theta_{0}} \left( \underbrace{\frac{\overline{X}_{n} - \theta_{0}}{\sqrt{\frac{1}{n}}}}_{\stackrel{H_{0}}{\simeq} N(0,1)} > \underbrace{\frac{c_{2} - \theta_{0}}{\sqrt{\frac{1}{n}}}}_{\eqdef \tilde{c}_{2}} \right) = F_{N(0,1)} (\tilde{c}_{1}) + 1 - F_{N(0,1)} (\tilde{c}_{2}) $.
+
+Ho quindi infinite combinazioni per determinare $ \tilde{c}_{1} $ e $ \tilde{c}_{2} $, quindi scelgo quelli che massimizzano la potenza del test, ovvero $ \tilde{c}_{2} = - \tilde{c_{1}} $.
+\end{es}
+
+\begin{oss}
+Con il diminuire di $ \alpha $, $ \tilde{c}_{1} $ aumenta sempre pi\`u fino ad arrivare al caso limite in cui si accetta sempre $ H_{0} $.
+\end{oss}
+
+\begin{defn}
+Siano $ X_{1}, \dotsc, X_{n} $ campione con funzione di verosimiglianza $ L(\underline{x}, \theta) $ con $ \theta \in \Theta \subseteq \mathbb{R} $. Si dice che la famiglia $ \{ L(\underline{x}, \theta) : \theta \in \Theta \} $ \`e detta di godere della propriet\`a del rapporto di verosimiglianza monotono (MLR, \emph{Monotone Likely Ratio}) in una statistica $ V $ se:
+\begin{itemize}
+\item il supporto di $ L(\overline{x}, \theta) $, cio\`e l'insieme $ \{ \underline{x} \in \mathbb{R}^{n} : L(\underline{x}, \theta) > 0 \} $, \`e indipendente da $ \theta $;
+\item esiste una statistica $ V : \mathbb{R}^{n} \to \mathbb{R} $ tale che, $ \forall\ \theta, \theta' \in \Theta $, con $ \theta \ge \theta' $ si ha:
+\begin{enumerate}
+\item $ L(\cdot, \theta) $ e $ L(\cdot, \theta') $ sono definite;
+\item $ \frac{L(\underline{x}, \theta')}{L(\underline{x}, \theta)} $ \`e non decrescente per $ V(\underline{X}) $.
+\end{enumerate}
+\end{itemize}
+\end{defn}
+
+\begin{prop}
+Si consideri un campione iid $ X_{1}, \dotsc, X_{n} $ con densit\`a di probabilit\`a $ f(\underline{x}, \theta) = \underbrace{C(\theta)}_{> 0} e^{Q(\theta) T(\underline{x})} \underbrace{h(\underline{x})}_{h(\cdot) \ne h(\cdot, \theta)} $. Si supponga che $ Q $ sia crescente in $ \theta $, allora la famiglia $ \{ L(\cdot, \theta) : \theta \in \Theta \} $ ha la propriet\`a MLR in $ V(\underline{X}) = \sum\limits_{i = 1}^{n} T(X_{i}) $. Se $ Q $ \`e invece decrescente in $ \theta $ allora la suddetta famiglia ha la propriet\`a MLR in $ V(\underline{X}) = - \sum\limits_{i = 1}^{n} T(X_{i}) $.
+\end{prop}
+
+\begin{proof}
+$ L(\underline{x}, \theta) = \prod\limits_{i = 1}^{n} f(x_{i}, \theta) = c^{n} (\theta) e^{Q(\theta) V(\underline{x})} \prod\limits_{i = 1}^{n} h(x_{i}) $
+
+quindi si ha, $ \forall\ \theta < \theta' $
+
+\[ \lambda = \frac{L(\underline{x}, \theta')}{L(\underline{x}, \theta)} = \frac{c^{n} (\theta') e^{Q(\theta') V(\underline{x})} \cancel{\prod\limits_{i = 1}^{n} h(x_{i})}}{c^{n} (\theta) e^{Q(\theta) V(\underline{x})} \cancel{\prod\limits_{i = 1}^{n} h(x_{i})}} = \left( \frac{c(\theta')}{c(\theta)} \right)^{n} e^{[Q(\theta') - Q(\theta)]V(\underline{x})} \]
+
+Perci\`o:
+\begin{itemize}
+\item Se $ Q $ \`e crescente, ovvero $ Q(\theta') - Q(\theta) > 0 $, allora $ \lambda $ \`e funzione crescente di $ V(\underline{x}) $
+\item Se $ Q $ \`e decrescente, ovvero $ Q(\theta') - Q(\theta) < 0 $, allora $ \lambda $ \`e funzione crescente di $ -V(\underline{x}) $
+\end{itemize}
+\end{proof}
+
+\begin{thm}
+Sia $ \underline{X} = (X_{1}, \dotsc, X_{n}) $ campione con funzione di verosimiglianza $ L(\underline{x}, \theta) $, con $ \theta \in \Theta \subseteq \mathbb{R} $, e si supponga $ \{ L(\cdot, \theta) : \theta \in \Theta \} $ goda della propriet\`a MLR in $ V(\underline{X}) $. Si supponga di voler verificare:
+\begin{itemize}
+\item $ H_{0} : \theta = \theta_{0} $
+\item $ H_{1} : \theta > \theta_{0} $ ($ \theta < \theta_{0} $)
+\end{itemize}
+a livello $ \alpha $, allora $ \exists\ \phi $ test di livello $ \alpha $ UMP dato da
+
+\[ \phi(\underline{X}) = \begin{cases}
+1 & V(\underline{X}) > c (V(\underline{X}) < c) \\
+0 & \text{altrimenti}
+\end{cases} \]
+
+dove $ c $ \`e determinato da $ \mathbb{P}_{\theta_{0}} (V(\underline{X}) > c) = \alpha $ ($ \mathbb{P}_{\theta_{0}} (V(\underline{X}) < c) = \alpha $)
+\end{thm}
+
+\begin{proof}
+Sia $ \theta' > \theta_{0} $ arbitrario e si consideri
+\begin{itemize}
+\item $ H_{0} : \theta = \theta_{0} $
+\item $ H_{1} : \theta = \theta' $
+\end{itemize}
+
+Applicando il lemma di Neyman-Pearson, si ha che il test UMP \`e dato da
+
+\begin{equation}	\label{equation:et1}
+\phi(\underline{X}) = \begin{cases}
+1 & \frac{L(\underline{x}, \theta')}{L(\underline{x}, \theta_{0})} > c^{\ast} \\
+0 & \text{altrimenti}
+\end{cases}
+\end{equation}
+
+con
+
+\begin{equation}	\label{equation:et2}
+\mathbb{P}_{\theta_{0}} \left( \frac{L(\underline{x}, \theta')}{L(\underline{x}, \theta_{0})} > c^{\ast} \right) = \alpha
+\end{equation}
+
+Sia ora $ \frac{L(\underline{x}, \theta')}{L(\underline{x}, \theta_{0})} = \psi_{\theta'} (V(\underline{x})) $ monotona crescente (e quindi invertibile, cio\`e $ \exists\ \psi_{\theta'}^{-1} $).
+
+$ \frac{L(\underline{x}, \theta')}{L(\underline{x}, \theta_{0})} > c^{\ast} \iff \psi_{\theta'} (V(\underline{x})) > c^{\ast} \iff V(\underline{x}) > \underbrace{\psi_{\theta'}^{-1} (c^{\ast})}_{c_{0}} \implies \mathbb{P}_{\theta_{0}} (\psi(V(\underline{x})) > c^{\ast}) = \mathbb{P}_{\theta_{0}} (V(\underline{x}) > \tilde{c}) = \alpha $.
+
+Si possono quindi riscrivere le equazioni $ (\ref{equation:et1}) $ e $ (\ref{equation:et2}) $ come
+\begin{itemize}
+\item $ \phi^{\ast} (\underline{X} = \begin{cases} 1 & V(\underline{X}) > \tilde{c} \\ 0 \text{altrimenti} \end{cases} $
+\item $ \mathbb{P}_{\theta_{0}} (V(\underline{x}) > \overline{c}) = \alpha $
+\end{itemize}
+
+indipendenti da $ \theta' $, quindi \`e il test di livello $ \alpha $ pi\`u potente $ \forall\ \theta' > \theta_{0} \implies $ \`e il test UMP di livello $ \alpha $.
+\end{proof}
+
+\subsection{Ipotesi composta contro ipotesi composta}
+\begin{thm}
+Sia $ X_{1}, \dotsc, X_{n} $ campione con $ L(\underline{x}, \theta) $, con $ \theta \in \Theta \subseteq \mathbb{R} $, che gode della propriet\`a MLR in $ V(\underline{X}) $. Se si vuole verificare
+\begin{itemize}
+\item $ H_{0} : \theta \le \theta_{0} $ ($ \theta \ge \theta_{0} $)
+\item $ H_{1} : \theta > \theta_{0} $ ($ \theta < \theta_{0} $)
+\end{itemize}
+
+il test UMP a livello $ \alpha $ \`e dato da $ \phi(\underline{X}) = \begin{cases} 1 & V(\underline{X}) > c (V(\underline{X}) < c) \\ 0 & \text{altrimenti} \end{cases} $ con $ \mathbb{P}_{\theta_{0}} (V(\underline{X}) > c) = \alpha $ ($ \mathbb{P}_{\theta_{0}} (V(\underline{X}) < c) = \alpha $)
+\end{thm}
+
+\begin{cor}
+Se $ X_{1}, \dotsc, X_{n} $ iid con densit\`a di probabilit\`a $ f(x, \theta) = c(\theta) e^{Q(\theta) T(x)} h(x) $ con $ Q $ strettamente monotona, allora il test UMP per verificare a livello $ \alpha $ che
+\begin{itemize}
+\item $ H_{0} : \theta \le \theta_{0} $
+\item $ H_{1} : \theta > \theta_{0} $
+\end{itemize}
+
+\`e $ \phi(\underline{X}) = \begin{cases} 1 & \sum\limits_{i = 1}^{n} T(x_{i}) > c \\ 0 & \text{altrimenti} \end{cases} $ con $ \mathbb{P}_{\theta_{0}} (\sum\limits_{i = 1}^{n} T(x_{i}) > c) = \alpha $.
+\end{cor}
+
+\section{Metodo del rapporto di massima verosimiglianza}
+Siano $ \underline{X} = (X_{1}, \dotsc, X_{n}) $ con funzione di verosimiglianza $ L(\underline{x}, \underline{\theta}) $, con $ \theta \in \mathcal{H} \subseteq \mathbb{R}^{k} $. Si vuole verificare;
+\begin{itemize}
+\item $ H_{0}: \underline{\theta} \in \mathcal{H}_{0} $
+\item $ H_{1}: \underline{\theta} \in \compl{\mathcal{H}_{0}} \eqdef \mathcal{H}_{1} $
+\end{itemize}
+
+Usando il rapporto di massima verosimiglianza si ha che
+
+\[ \lambda(\underline{x}) = \frac{\max\limits_{\underline{\theta} \in \mathcal{H}_{0}} L(\underline{x}, \underline{\theta})}{\max\limits_{\underline{\theta} \in \mathcal{H}} L(\underline{x}, \underline{\theta})} \]
+
+Il criterio che determiner\`a la regione critica di livello $ \alpha $ sar\`a: rigetto $ H_{0} $ se $ \lambda(\underline{x}) \le c $, con $ \sup\limits_{\underline{\theta} \in \mathcal{H}_{0}} \mathbb{P}_{\underline{\theta}} \left( \lambda(\underline{x}) \le c \right) = \alpha $, quindi $ C = \{ \underline{x} \in \mathbb{R}^{k} : \lambda (\underline{x}) \le c \} $.
+
+\begin{thm}
+Sotto $ H_{0} $ la variabile aleatoria
+
+\[ -2 \log \lambda (\underline{X}) \stackrel{d}{\to} \chi^{2}_{k} \]
+
+per $ n \to +\infty $ e con $ k = \dim \mathcal{H} - \dim \mathcal{H}_{0} $.
+\end{thm}
+
+\begin{es}
+Siano $ X_{1}, \dotsc, X_{n} $ iid $ \sim N(\mu, \sigma_{0}^{2}) $ con $ \mu \in \mathcal{H} = \mathbb{R} $ incognita e $ \sigma_{0}^{2} $ nota. Si vuole testare:
+\begin{itemize}
+\item $ H_{0}: \mu = \mu_{0} \leadsto \mu \in \mathcal{H}_{0} = \{ \mu_{0} \} $
+\item $ H_{1}: \mu \ne \mu_{0} \leadsto \mu \in \mathcal{H}_{1} = \compl{\mathcal{H}} $
+\end{itemize}
+
+Svolgendo i conti si ottiene che
+
+\[ \lambda(\underline{x}) = e^{- n \frac{(\overline{X} - \mu_{0})^{2}}{2 \sigma_{0}^{2}}} \]
+
+Imponendo che $ \lambda (\underline{x}) \le c $ si ottiene che $ - n(\overline{X} - \mu_{0})^{2} \le 2 \sigma_{0}^{2} \log c \iff (\overline{X}- \mu_{0})^{2} \ge \underbrace{-2 \log c}_{c_{1}} \frac{\sigma_{0}^{2}}{n} \iff \vert \overline{X} - \mu_{0} \vert \ge \underbrace{\sqrt{c_{1}}}_{c_{2}} \frac{\sigma_{0}}{\sqrt{n}} \implies C = \{ \underline{x} \in \mathbb{R}^{k} : \overline{X} \le \mu_{0} - c_{2} \frac{\sigma_{0}}{\sqrt{n}} \lor \overline{X} \ge \mu_{0} + c_{2} \frac{\sigma_{0}}{\sqrt{n}} \} $
+
+Se impongo che il test sia di livello $ \alpha $ si ottiene che $ F_{N(0,1)} = 1 - \frac{\alpha}{2} $.
+
+Quindi
+
+\[ - 2 \log \lambda (\underline{x}) = \frac{n}{\sigma_{0}^{2}} (\overline{X} - \mu_{0})^{2} = \left( \frac{\overline{X} - \mu_{0}}{\frac{\sigma_{0}}{\sqrt{n}}} \right)^{2} \stackrel{d}{\to} \chi^{2}_{k} \]
+
+Quanto vale $ k $? $ k = \dim \mathcal{H} - \dim \mathcal{H}_{0} = \dim \mathbb{R} - \dim \{ \mu_{0} \} = 1 - 0 = 1 $
+
+Quindi 
+
+\[ - 2 \log \lambda (\underline{x}) \stackrel{d}{\to} \chi^{2}_{1} \]
+
+Infatti $ \frac{\overline{X} - \mu_{0}}{\frac{\sigma_{0}}{\sqrt{n}}} \stackrel{H_{0}}{\to} N(0, 1), \forall\ n $ e quindi $ - 2 \log \lambda (\underline{x}) \sim \chi^{2}_{1}, \forall\ n $.
+\end{es}
+
+\begin{es}
+Siano $ X_{1}, \dotsc, X_{n} $ iid $ \sim N(\theta_{1}, \theta_{2}) $. Fissato $ \underline{\theta} = (\theta_{1}, \theta_{2}) $ e $ \mathcal{H} = \mathbb{R} \times \mathbb{R}^{+} $, si verifichi:
+\begin{itemize}
+\item $ H_{0}: \theta_{1} = 0 \leadsto \underline{\theta} \in \mathcal{H}_{0} = \{ 0 \} \times \mathbb{R}^{+} $ (ipotesi composta)
+\item $ H_{1}: \theta_{1} \ne 0 \leadsto \underline{\theta} \in \compl{\mathcal{H}_{0}} = \mathbb{R} \setminus \{ 0 \} \times \mathbb{R}^{+} $ (ipotesi composta)
+\end{itemize}
+
+Applicando il rapporto di massima verosimiglianza si ottiene:
+\begin{itemize}
+\item $ L_{\mathcal{H}_{0}} (\underline{x}, \underline{\theta}) = \max\limits_{\underline{\theta} \in \mathcal{H}_{0}} L(\underline{x}, \underline{\theta}) $
+\item $ L_{\mathcal{H}} (\underline{x}, \underline{\theta}) = \max\limits_{\underline{\theta} \in \mathcal{H}} L(\underline{x}, \underline{\theta}) $
+\end{itemize}
+
+Derivando e uguagliando a $ 0 $ si ottiene
+\begin{itemize}
+\item $ \mathcal{H} : \begin{cases} \hat{\hat{\theta}}_{1} = \frac{1}{n} \sum\limits_{i = 1}^{n} X_{i} \\ \hat{\hat{\theta}}_{2} = \frac{1}{n} \sum\limits_{i = 1}^{n} (X_{i} - \overline{X}_{n})^{2} \end{cases} $
+\item $ \mathcal{H}_{0} : \begin{cases} \hat{\theta}_{1} = 0 \\ \hat{\theta}_{2} = \frac{1}{n} \sum\limits_{i = 1}^{n} X_{i}^{2} \end{cases} $
+\end{itemize}
+
+I corrispondenti massimi sono:
+\begin{itemize}
+\item $ L_{\mathcal{H}_{0}} (\underline{x}, \underline{\theta}) = \left( \frac{n e^{-1}}{2 \pi \sum\limits_{i = 1}^{n} X_{i}^{2}} \right)^{\frac{n}{2}} $
+\item $ L_{\mathcal{H}} (\underline{x}, \underline{\theta}) = \left( \frac{n e^{-1}}{2 \pi \sum\limits_{i = 1}^{n} (X_{i} - \overline{X}_{n})^{2}} \right)^{\frac{n}{2}} $
+\end{itemize}
+
+Che implica che $ \lambda (\underline{x}) = \left( \frac{\sum\limits_{i = 1}^{n} (X_{i} - \overline{X}_{n})^{2}}{\sum\limits_{i = 1}^{n} X_{i}^{2}} \right)^{\frac{n}{2}} $
+
+Il criterio usato sar\`a: rigetto $ H_{0} $ se $ \lambda(\underline{x}) \le c \iff \frac{\sum\limits_{i = 1}^{n} (X_{i} - \overline{X}_{n})^{2}}{\sum\limits_{i = 1}^{n} X_{i}^{2}} \le c^{\frac{2}{n}} \eqdef c_{1} $ con $ \sup\limits_{\underline{\theta} \in \mathcal{H}_{0}} \mathbb{P}_{\underline{\theta}} \left( \underbrace{\frac{\sum\limits_{i = 1}^{n} (X_{i} - \overline{X}_{n})^{2}}{\sum\limits_{i = 1}^{n} X_{i}^{2}}}_{B} \le c_{1} \right) = \alpha $
+
+Tenendo conto che:
+\begin{itemize}
+\item $ \sum\limits_{i = 1}^{n} (X_{i} - \overline{X}_{n})^{2} $ \`e la variabile campionaria senza ipotesi (senza $ \frac{1}{n} $)
+\item $ \sum\limits_{i = 1}^{n} X_{i}^{2} $ \`e la variabile campionaria con vera $ H_{0} $ (senza $ \frac{1}{n} $)
+\end{itemize}
+
+allora si ha che $ \sum\limits_{i = 1}^{n} X_{i} = \sum\limits_{i = 1}^{n} (X_{i} - \overline{X}_{n})^{2} + n \overline{X}_{n}^{2} \implies B = \frac{1}{1 + \frac{n \overline{X}_{n}^{2}}{\sum\limits_{i = 1}^{n} (X_{i} - \overline{X}_{n})^{2}}} \le c_{1} \implies \frac{n \overline{X}_{n}^{2}}{\sum\limits_{i = 1}^{n} (X_{i} - \overline{X}_{n})^{2}} \ge \frac{1 - c_{1}}{c_{1}} \eqdef c_{2} $
+
+Dato che $ \overline{X}_{n} \stackrel{H_{0}}{\sim} N \left( 0, \frac{\theta_{2}}{n} \right) \implies \frac{\overline{X}_{n}}{\sqrt{\frac{\theta_{2}}{n}}} \sim N(0, 1) \implies \frac{\overline{X}_{n}^{2}}{\frac{\theta_{2}}{n}} \sim \chi^{2}_{1} $ e che $ \begin{cases} \frac{n \overline{X}_{n}^{2}}{\theta_{2}} \sim \chi^{2}_{1} \\ \frac{\sum\limits_{i = 1}^{n} (X_{i} - \overline{X}_{n})^{2}}{\theta_{2}} \sim \chi^{2}_{n - 1} \end{cases} \stackrel{\footnotemark[2]}{\implies} \frac{\frac{n \overline{X}_{n}^{2}}{\theta_{2}}}{\frac{\sum\limits_{i = 1}^{n} (X_{i} - \overline{X}_{n})^{2}}{\theta_{2}}} \sim \frac{\chi^{2}_{1}}{\chi^{2}_{n - 1}} $, il cui numeratore e denominatore sono indipendenti tra loro, quindi
+
+\[ B \le c_{2} \iff \frac{n \overline{X}_{n}^{2}}{\frac{\sum\limits_{i = 1}^{n} (X_{i} - \overline{X}_{n})^{2}}{n - 1}} \sim \frac{\frac{\chi^{2}_{1}}{1}}{\frac{\chi^{2}_{n - 1}}{n - 1}} \le \underbrace{c_{2} (n - 1)}_{c_{3}} \]
+
+\footnotetext[2]{Dato che i dati sono normali e indipendenti}
+
+% TODO: grafico
+
+Dato che \`e un test a livello $ \alpha $ si ha che $ \alpha = \mathbb{P}_{\underline{\theta}} (B \le c_{1}) \stackrel{\forall\ \theta \in \mathcal{H}_{0}}{=} \mathbb{P}_{\underline{\theta}} \left( \frac{n \overline{X}_{n}^{2}}{\frac{\sum\limits_{i = 1}^{n} (X_{i} - \overline{X}_{n})^{2}}{n - 1}} \ge c_{3} \right) = \mathbb{P}_{\underline{\theta}} (F_{1, n - 1} \ge c_{3}) $
+
+La regione critica del test risulta perci\`o $ C = \{ \underline{x} \in \mathbb{R}^{k} : \underbrace{\frac{n \overline{X}_{n}^{2}}{\frac{\sum\limits_{i = 1}^{n} (X_{i} - \overline{X}_{n})^{2}}{n + 1}}}_{F} \ge c_{F_{1, n - 1}; 1 - \alpha} \} $
+
+Si ha che $ \lambda (\underline{x}) \le c \iff -2 \log \lambda (\underline{x}) \ge c_{1} \iff - n \log \left( \frac{\sum\limits_{i = 1}^{n} (X_{i} - \overline{X}_{n})^{2}}{\sum\limits_{i = 1}^{n} X_{i}^{2}} \right) \mathop{\to}\limits_{H_{0}}^{d} \chi^{2}_{k} $, dove $ k = \dim \mathcal{H} - \dim \mathcal{H}_{0} = \dim (\mathbb{R} \times \mathbb{R}^{+}) - \dim (\{ 0 \} \times \mathbb{R}^{+}) = 2 - 1 = 1 $
+
+$ \implies \mathbb{P} (-2 \log \lambda \ge c_{1})  = \mathbb{P}_{\underline{\theta}} \left( -n \log \frac{\sum\limits_{i = 1}^{n} (X_{i} - \overline{X}_{n})^{2}}{\sum\limits_{i = 1}^{n} X_{i}^{2}} \ge c_{1} \right) = \alpha $ con $ \underline{\theta} \in \mathcal{H}_{0} $ si ricava che $ F_{\chi^{2}_{1}} (c_{1}) = 1 - \alpha $
+
+% TODO: Grafico
+
+$ \sqrt{F} = \frac{\sqrt{n} \frac{\overline{X}}{\sqrt{\theta_{2}}}}{\sqrt{\frac{\sum\limits_{i = 1}^{n} (X_{i} - \overline{X})^{2}}{(n - 1) \theta_{2}}}} \sim \frac{N(0, 1)}{\sqrt{\frac{\chi^{2}_{n - 1}}{n - 1}}} \sim t_{n - 1} $ in quanto numeratore e denominatore sono indipendenti tra loro.
+
+Il test di prima \`e equivalente a quello che usa
+
+\[ C_{1} = \{ \underline{x} \in \mathbb{R}^{n} : \underbrace{\vert \sqrt{F} \vert}_{\sim t_{n - 1}} \ge d \]
+
+e quindi $ \mathbb{P}_{\mathcal{H}_{0}} (\underline{x} \in C) = \alpha $
+
+% TODO: Grafico
+\end{es}
+
+\begin{es}
+Siano $ X_{1}, \dotsc, X_{n} \sim N(\mu, \sigma^{2}) $ e si consideri le  seguenti ipotesi:
+\begin{itemize}
+\item $ H_{0}: \mu = \mu_{0} $
+\item $ H_{1}: \mu \ne \mu_{0} $
+\end{itemize}
+
+La regione critica del test \`e $ C_{1} = \{ \underline{x} \in \mathbb{R}^{n} : \overline{X} \le \mu_{0} - c_{t_{n - 1}; 1 - \frac{\alpha}{2}} \sqrt{\frac{S_{n}^{2}}{n}} \lor \overline{X} \ge \mu_{0} + c_{t_{n - 1}; 1 - \frac{\alpha}{2}} \sqrt{\frac{S_{n}^{2}}{n}} \} $ con $ S_{n}^{2} = \frac{1}{n - 1} \sum\limits_{i = 1}^{n} (X_{i} - \overline{X}_{n})^{2} $
+
+% TODO: Grafico
+\end{es}
+
+\section{Analogie tra verifica di ipotesi e intervalli di fiducia}
+
+Siano $ X_{1}, \dotsc, X_{n} \sim N(\mu, \sigma^{2}) $ con $ \sigma^{2} $ nota.
+
+\begin{enumerate}
+\item Verifico le seguenti ipotesi:
+\begin{itemize}
+\item $ H_{0}: \mu = \mu_{0} $
+\item $ H_{1}: \mu \ne \mu_{0} $
+\end{itemize}
+
+Si ipotizza che $ H_{0} $ sia vera $ \iff \mu_{\text{vera}} = \mu_{0} \iff \overline{X}_{n} \sim N \left( \mu_{0}, \frac{\sigma^{2}}{n} \right) $.
+
+Si determina $ c $ tale che $ 1 - \alpha = \mathbb{P}_{H_{0}} \left( -c \le \frac{\overline{X} - \mu_{0}}{\sqrt{\frac{\sigma^{2}}{n}}} \le c \right) = \mathbb{P}_{H_{0}} \left( \underbrace{\mu_{0} - c \sqrt{\frac{\sigma^{2}}{n}}}_{L_{1}} \le \overline{X} \le \underbrace{\mu_{0} + c \sqrt{\frac{\sigma^{2}}{n}}}_{L_{2}} \right) $
+
+% TODO: Grafico
+
+Rigetto $ H_{0} \iff \overline{X}_{n} \not\in [L_{1}, L_{2}] $
+\item Intervallo di fiducia per $ \mu $ a livello $ \alpha $.
+
+\[ \overline{X}_{n} \sim N \left( \mu, \frac{\sigma^{2}}{n} \right) \]
+
+quindi
+
+$  1 - \alpha = \mathbb{P} (L_{1}' \le \mu \le L_{2}') = \mathbb{P} \left( \underbrace{\frac{}{}}_{c_{1}} \le \underbrace{\frac{}{}}_{\sim N(0, 1)} \le \underbrace{\frac{}{}}_{c_{2}} \right) \implies 1 - \alpha = \mathbb{P} \left( \overline{X} - c \frac{\sigma}{\sqrt{n}} \le \mu \le \overline{X} + c \frac{\sigma}{\sqrt{n}} \right) $
+
+% TODO: Grafici. 
+$ [L_{1}', L_{2}'] $ \`e l'intervallo di fiducia a livello $ 1 - \alpha $ per $ \mu $. 
+\end{enumerate}
+
+Il criterio equivalente a quello precedente \`e: rigetto $ H_{0} $ se $ \mu_{0} \not\in [L_{1}, L_{2}] $. Se $ [L_{1}, L_{2}] $ \`e un intervallo di fiducia a livello $ 1 - \alpha $ per un parametro $ \theta $ e si vuole verificare:
+\begin{itemize}
+\item $ H_{0}: \theta = \theta_{0} $
+\item $ H_{1}: \theta \ne \theta_{0} $
+\end{itemize} 
+
+a livello $ \alpha $ allora un test di livello $ \alpha $ \`e dato dal criterio: rigetto $ H_{0} $ se $ \theta_{0} \not\in [L_{1}, L_{2}] $.
+
+\section{Confronto di medie tra due campioni indipendenti}
+Se sono incerto sulla distribuzione dei dati \`e meglio usare la $ T $ di Student.
+
+Siano $ X \sim N(\theta_{1}, \theta_{3}) $ e $ Y \sim N(\theta_{2}, \theta_{3}) $ indiepndenti, ciascuna campionata nel seguente modo:
+
+\begin{itemize}
+\item $ X_{1}, \dotsc, X_{n} \sim N $ iid
+\item $ Y_{1}, \dotsc, Y_{n} \sim N $ iid
+\end{itemize}
+
+Voglio verificare i seguenti test:
+
+\begin{itemize}
+\item $ H_{0} : \theta_{1} = \theta_{2} = \tilde{\theta} $
+\item $ H_{1} : \theta_{1} \ne \theta_{2} $
+\end{itemize}
+
+$ \underline{\theta} = (\theta_{1}, \theta_{2}, \theta_{3}) \in \mathcal{H} = \mathbb{R} \times \mathbb{R} \times \mathbb{R}^{+} $
+
+$ \mathcal{H}_{0} = \{ \underline{\theta} \in \mathcal{H} : \theta_{1} = \theta_{2} \} $
+
+Si costruisce la funzione di massima verosimiglianza:
+
+$ L^{\mathcal{H}} (\underline{\theta}, \underline{x}, \underline{y}) = \left( \frac{1}{\sqrt{2 \pi \theta_{3}}} \right)^{n + m} \exp \left\{ - \frac{1}{2 \theta_{3}} \left[ \sum\limits_{i = 1}^{m} (x_{i} - \theta_{1})^{2} + \sum\limits_{i = 1}^{m} (y_{i} - \theta_{2})^{2} \right] \right\} $
+
+$ L^{\mathcal{H}_{0}} (\underline{\theta}, \underline{x}, \underline{y}) = \left( \frac{1}{\sqrt{2 \pi \theta_{3}}} \right)^{n + m} \exp \left\{ - \frac{1}{2 \theta_{3}} \left[ \sum\limits_{i = 1}^{m} (x_{i} - \tilde{\theta})^{2} + \sum\limits_{i = 1}^{m} (y_{i} - \tilde{\theta})^{2} \right] \right\} $
+
+Massimizzando, si ottiene:
+
+$ \max\limits_{\underline{\theta} \in \mathcal{H}} L^{\mathcal{H}} = \begin{cases} \hat{\hat{\theta}}_{1} = \frac{1}{m} \sum\limits_{i = 1}^{m} x_{i} = \overline{x} \\ \hat{\hat{\theta}}_{2} = \frac{1}{n} \sum\limits_{i = 1}^{n} y_{i} = \overline{y} \\ \hat{\hat{\theta}}_{3} = \frac{1}{n + m} \left( \sum\limits_{i = 1}^{m} (x_{i} - \hat{\hat{\theta}}_{1})^{2} + \sum\limits_{i = 1}^{n} (y_{i}  \hat{\hat{\theta}}_{2})^{2} \right) \end{cases} $
+
+$ \max\limits_{\underline{\theta} \in \mathcal{H}_{0}} L^{\mathcal{H}_{0}} = \begin{cases} \hat{\tilde{\theta}} = \frac{1}{n + m} \left( \sum\limits_{i = 1}^{m} x_{i} + \sum\limits_{i = 1}^{n} y_{i} \right) \\ \hat{\theta}_{3} = \frac{1}{n + m} \left( \sum\limits_{i = 1}^{m} (x_{i} - \hat{\tilde{\theta}})^{2} + \sum\limits_{i = 1}^{n} (y_{i} - \hat{\tilde{\theta}})^{2} \right) \end{cases} $
+
+Sostituendo in $ L^{\mathcal{H}} $ e $ L^{\mathcal{H}_{0}} $ si ha:
+
+\[ \lambda = \frac{\max\limits_{\theta \in \mathcal{H}_{0}} L^{\mathcal{H}_{0}}}{\max\limits_{\theta \in \mathcal{H}} L^{\mathcal{H}}} = \left( \frac{\hat{\hat{\theta}}_{3}}{\hat{\theta}_{3}} \right)^{\frac{n + m}{2}} \]
+
+Rigetto quindi $ H_{0} $ se $ \lambda \le c \iff \lambda^{\frac{2}{n + m}} = \frac{\hat{\hat{\theta}}_{3}}{\hat{\theta}_{3}} \le \underbrace{c^{\frac{2}{n + m}}}_{\eqdef c_{1}} $
+
+% TODO: Grafico
+
+La regione critica $ C $ avr\`a la seguente forma:
+
+\[
+C = \left\{ (\underline{x}, \underline{y}) \in \mathbb{R}^{m} \times \mathbb{R}^{n} : \frac{\hat{\hat{\theta}}_{3}}{\hat{\theta}_{3}} \le c_{1} \right\}
+\]
+
+o, meglio,
+
+\[
+C = \left\{ (\underline{x}, \underline{y}) \in \mathbb{R}^{m} \times \mathbb{R}^{n} : \frac{\sum\limits_{i = 1}^{m} (x_{i} - \overline{x})^{2} + \sum\limits_{i = 1}^{n} (y_{i} - \overline{y})^{2}}{\sum\limits_{i = 1}^{m} (x_{i} - \hat{\tilde{\theta}})^{2} + \sum\limits_{i = 1}^{n} (y_{i} - \hat{\tilde{\theta}})^{2}} \le c_{1} \right\}
+\]
+
+con $ \sup\limits_{\underline{\theta} \in \mathcal{H}_{0}} \mathbb{P}_{\underline{\theta}} \left( (\underline{X}, \underline{Y}) \in C \right) = \alpha $
+
+Sotto $ H_{0} $ si ha quindi che $ \overline{X} \sim N \left( \tilde{\theta}, \frac{\theta_{3}}{m} \right) $ e $ \overline{Y} \sim N \left( \tilde{\theta}, \frac{\theta_{3}}{n} \right) $, indipendenti. Perci\`o, $ \overline{X} - \overline{Y} \sim N \left( \tilde{\theta} - \tilde{\theta}, \theta_{3} \left( \frac{1}{m} + \frac{1}{n} \right) \right) $ e quindi $ \frac{(\overline{X} - \overline{Y})^{2}}{\theta_{3} \left( \frac{1}{m} + \frac{1}{n} \right)} \sim \chi^{2}_{1} $ con $ SS_{X} = \sum\limits_{i = 1}^{m} (X_{i} - \overline{X})^{2} $ e $ SS_{Y} = \sum\limits_{i = 1}^{n} (Y_{i} - \overline{Y})^{2} $
+
+Dato che i dati sono normali si ha che $ \frac{SS_{X}}{\theta_{3}} \sim \chi^{2}_{m-1} $ e  $ \frac{SS_{Y}}{\theta_{3}} \sim \chi^{2}_{n - 1} $, indipendenti, perci\`o
+
+\begin{equation}	\label{equation:e2}
+\frac{SS_{X} + SS_{Y}}{\theta_{3}} \sim \chi^{2}_{m + n - 2}
+\end{equation}
+
+e $ \overline{X} $ e $ \overline{Y} $ sono indipendenti da $ SS_{X} $ e $ SS_{Y} $, da cui si ricava l'indipendenza tra $ (\ref{equation:e1}) $ e $ (\ref{equation:e2}) $, che implica che $ \mathcal{F} = \frac{\frac{(\overline{X}-\overline{Y})^{2}}{\theta_{3} \left( \frac{1}{m} + \frac{1}{n} \right)}}{\frac{SS_{X} + SS_{Y}}{\theta_{3} (m + n - 2)}} = \frac{(\overline{X} - \overline{Y})^{2} (n + m - 2)}{(SS_{X} + SS_{Y}) \left( \frac{1}{m} + \frac{1}{n} \right)} \stackrel{H_{0}}{\simeq} F_{1, n + m - 2} $
+
+Com'\`e $ F $?
+
+Dato che:
+\begin{itemize}
+\item $ \sum\limits_{i = 1}^{m} (X_{i} - \hat{\tilde{\theta}})^{2} = \sum\limits_{i = 1}^{m} [(X_{i} - \overline{X}) - (\overline{X} - \hat{\tilde{\theta}})]^{2} = \sum\limits_{i = 1}^{m} (X_{i} - \overline{X})^{2} + \frac{mn^2}{(m + n)^{2}} (\overline{X} - \overline{Y})^{2} $
+\item $ \sum\limits_{i = 1}^{n} (Y_{i} - \hat{\tilde{\theta}})^{2} = \sum\limits_{i = 1}^{n} (Y_{i} - \overline{Y})^{2} + \frac{mn^2}{(m + n)^{2}} (\overline{X} - \overline{Y})^{2} $
+\end{itemize}
+
+si ha che
+
+$ \lambda^{\frac{2}{n + m}} = \frac{\sum\limits_{i = 1}^{m} (X_{i} - \overline{X})^{2} + \sum\limits_{i = 1}^{n} (Y_{i} - \overline{Y})^{2}}{\sum\limits_{i = 1}^{m} (X_{i} - \overline{X})^{2} + \sum\limits_{i = 1}^{n} (Y_{i} - \overline{Y})^{2} + \underbrace{\frac{mn}{m + n}}_{= \left( \frac{1}{m} + \frac{1}{n} \right)^{-1}} (\overline{X} - \overline{Y})^{2}} = \frac{1}{1 + \frac{ (\overline{X} - \overline{Y})^{2}}{(SS_{X}  + SS_{Y}) \left( \frac{1}{m} + \frac{1}{n} \right)}} \le c_{1} \iff \frac{(\overline{X} - \overline{Y})^{2}}{(SS_{X} + SS_{Y}) \left( \frac{1}{m} + \frac{1}{n} \right)} \ge \frac{1 - c_1}{c_1} \eqdef c_2 \iff \mathcal{F} = \frac{(\overline{X} - \overline{Y})^{2} (m + n - 2)}{(SS_{X} + SS_{Y}) \left( \frac{1}{m} + \frac{1}{n} \right)} \ge c_2 (m + n -2) \eqdef c_{3} $
+
+La regione critica \`e quindi la seguente:
+
+$ C = \{ (\overline{x}, \overline{y}) \in \mathbb{R}^{m} \times \mathbb{R}^{n} : \mathcal{F} \ge c_{3} \} $ con $ P_{\underline{\theta} \in \mathcal{H}_{0}} \left( (\overline{X}, \overline{Y}) \in C \right) = cost = \alpha \implies c_3 $ \`e il valore critico di $ F_{1, n + m - 2} $ a livello $ 1 - \alpha $
+
+% TODO: grafico della T di Student con coda alpha tagliata
+
+oppure equivalentemente:
+
+\[ T = \sqrt{\mathcal{F}} = \frac{\overline{X} - \overline{Y}}{\sqrt{\frac{SS_{X} + SS_{Y}}{n + m - 2}} \left( \frac{1}{m} + \frac{1}{n} \right)} \stackrel{H_{0}}{\simeq} t_{n + m - 2} \] 
+
+Rigetto quindi $ H_{0} $ se $ \vert T \vert > c' $ con $ \mathbb{P}_{\underline{\theta} \in \mathcal{H}_{0}} (\vert T \vert > c') = \alpha $
+
+\begin{figure}[H]
+\begin{tikzpicture}
+\draw[->] (0, -0.5) -- (0, 2);
+\draw[->] (-3, 0) -- (3, 0);
+\draw[domain=-3:3, smooth, variable=\x, black] plot ({\x}, exp{-(\x)*(\x)});
+\draw[dotted] (-1, 0.368) -- (-1, 0);
+\draw[dotted] (1, 0.368) -- (1, 0);
+\draw (-1, 0) node[below] {$ -c' $};
+\draw (1, 0) node[below] {$ c' $};
+
+\filldraw[pattern=north east lines, pattern color=black!20, domain=1:3, smooth, variable=\x] plot ({\x}, exp{-(\x)*(\x)}) -| (1, 0) -- cycle;
+
+\filldraw[pattern=north east lines, pattern color=black!20, domain=-3:-1, smooth, variable=\x] plot ({\x}, exp{-(\x)*(\x)}) -| (-1, 0) -- cycle;
+\end{tikzpicture}
+\caption{$ T $-test per il confronto di medie: $ \phi_{t_{n + m - 2}} (c') = 1 - \frac{\alpha}{2} $. Le due aree colorate misurano ciascuna $ \frac{\alpha}{2} $}
+\end{figure}
+
+\begin{defn}
+Quando due campioni hanno la stessa varianza si dice che si \`e nel caso omoschedastico o omoscedastico. Se invece le varianze di due o pi\`u campioni sono diverse, allora si \`e nel caso eteroschedastico o eteroscedastico
+\end{defn}
+
+\begin{es}
+Si consideri il caso omoschedastico con due campioni che non sono due gaussiane. Si consideri
+
+$ \mathcal{F} = \frac{\frac{(\overline{X} - \overline{Y})^{2}}{\left( \frac{1}{m} + \frac{1}{n} \right) \theta_{3}}}{\frac{SS_{X} + SS_{Y}}{(m + n - 2) \theta_{3}}} = \frac{A}{B} $
+
+e si applichi il teorema del limite centrale. Si sa quindi che
+
+\begin{itemize}
+\item $ \overline{X} \sim AN \left( \theta_{1}, \frac{\theta_{3}}{m} \right) $
+\item $ \overline{Y} \sim AN \left( \theta_{2}, \frac{\theta_{3}}{m} \right) $
+\end{itemize}
+
+e quindi sotto $ H_{0} $ si ha che $ \overline{X} - \overline{Y} \sim AN \left( 0, \theta_{3} \left( \frac{1}{n} + \frac{1}{m} \right) \right) $
+
+Da cui
+
+$ A = \left( N(0,1) \right)^{2} = \chi^{2}_{1} $ ovvero $ A \stackrel{d}{\to} \chi^{2}_{1} $ con $ n, m \to +\infty $.
+
+Quindi, con $ m, n \to +\infty $
+$ \begin{cases}
+S^{2}_{X} = \frac{1}{m - 1} SS_{X} \stackrel{P}{\to} \theta_{3} \iff \mathbb{P} \left( \vert \frac{SS_{X}}{m - 1} - \theta_{3} \vert \le \varepsilon \right) \to 1, \forall\ \varepsilon > 0 \\
+S^{2}_{Y} = \frac{1}{n - 1} SS_{Y} \stackrel{P}{\to} \theta_{3} \iff \mathbb{P} \left( \vert \frac{SS_{Y}}{n - 1} - \theta_{3} \vert \le \varepsilon \right) \to 1, \forall\ \varepsilon > 0
+\end{cases}
+\iff 
+\begin{cases}
+\mathbb{P} \left( \vert SS_{X} - (m - 1) \theta_{3} \vert \le (m - 1) \varepsilon \right) \to 1 \\
+\mathbb{P} \left( \vert SS_{Y} - (m - 1) \theta_{3} \vert \le (n - 1) \varepsilon \right) \to 1
+\end{cases}
+\implies \mathbb{P} \left( \vert SS_{X} + SS_{Y} - (m + n - 2) \theta_{3} \vert \le (m + n - 2) \varepsilon \right) \stackrel{\footnotemark[1]}{\ge} \mathbb{P} \left( \vert SS_{X} - (m - 1) \theta_{3} \vert + \vert SS_{Y} - (n - 1) \theta_{3} \vert \le (m + n - 2) \varepsilon \right) \to 1 \implies \frac{SS_{X} + SS_{Y}}{m + n - 2} \stackrel{P}{\to} \theta_{3} \implies B \stackrel{P}{\to} 1 $
+
+\footnotetext[1]{Disuguaglianza triangolare: $ \vert a + b \vert \ge \vert a \vert + \vert b \vert $}
+E per il teorema di Slutsky si ha che $ \mathcal{F} = \frac{A \stackrel{d}{\to} \chi^{2}_{1}}{B \stackrel{P}{\to} 1} \stackrel{d}{\to} \chi^{2}_{1} $ oppure che $ T = \sqrt{\mathcal{F}} \stackrel{d}{\to} N(0,1) $
+
+Se uso il rapporto ML si ha che
+
+\[ -2 \log \lambda \to \chi^{2}_{k} \]
+
+con $ k = \dim \mathcal{H} - \dim \mathcal{H_{0}} = \dim (\mathbb{R} \times \mathbb{R} \times \mathbb{R}^{+}) - \dim (\mathbb{R} \times \mathbb{R}^{+}) = 3 - 2 = 1 $
+
+Quindi $ - 2 \log \lambda \to \chi^{2}_{1} $.
+\end{es}
+
+\section{Confronto di varianze}
+
+Dati:
+
+\begin{itemize}
+\item $ X_{1}, \dotsc, X_{n} \sim N(\theta_{1}, \theta_{3} $ iid
+\item $ Y_{1}, \dotsc, Y_{n} \sim N(\theta_{2}, \theta_{4} $ iid
+\end{itemize}
+
+indiepndenti tra loro, si voglia eseguire i seguenti test:
+\begin{itemize}
+\item $ H_{0}: \theta_{3} = \theta_{4} $
+\item $ H_{1}: \theta_{3} \ne \theta_{4} $
+\end{itemize}
+
+Dato che
+\begin{itemize}
+\item $ L(\mathcal{H}) = \left( \frac{1}{2 \pi \theta_{3}} \right)^{\frac{n}{2}} \exp \left( - \frac{1}{2 \theta_{3}} \sum (X_{i} - \theta_{1})^{2} \right) \left( \frac{1}{2 \pi \theta_{4}} \right)^{\frac{n}{2}} \exp \left( - \frac{1}{2 \theta_{4}} \sum (Y_{i} - \theta_{2})^{2} \right) $
+\item $ L(\mathcal{H}_{0}) = \left( \frac{1}{2 \pi \tilde{\theta}} \right)^{\frac{n + m}{2}} \exp \left( - \frac{1}{2 \tilde{\theta}} \sum (X_{i} - \theta_{1})^{2} + (Y_{i} - \theta_{2})^{2} \right) $
+\end{itemize}
+
+Si ha massimizzando che
+\begin{itemize}
+\item $ \mathcal{H} = \begin{cases}
+\hat{\hat{\theta}}_{1} = \overline{x} \\
+\hat{\hat{\theta}}_{2} = \overline{y} \\
+\hat{\hat{\theta}}_{3} = \frac{1}{n} \sum (X_{i} - \overline{X})^{2} \\
+\hat{\hat{\theta}}_{4} = \frac{1}{m} \sum (Y_{i} - \overline{Y})^{2}
+\end{cases} $
+\item $ \mathcal{H}_{0} = \begin{cases}
+\hat{\theta}_{1} = \overline{x} \\
+\hat{\theta}_{2} = \overline{y} \\
+\hat{\tilde{\theta}} = \frac{1}{n + m} \sum (X_{i} - \overline{X})^{2} + (Y_{i} - \overline{Y})^{2} \\
+\end{cases} $
+\end{itemize}
+
+Da cui si ricava che
+
+$ \lambda = \frac{\hat{\hat{\theta}}_{3}^{\frac{n}{2}} \hat{\hat{\theta}}_{4}^{\frac{m}{2}}}{\hat{\tilde{\theta}}^{\frac{n + m}{2}}} $, con $ \underline{\theta} = (\theta_{1}, \theta_{2}, \theta_{3}, \theta_{4}) $
+
+rigetto $ H_{0} $ se -----
+
+\begin{itemize}
+\item $ \frac{SS_{X}}{\tilde{\theta}} = \frac{\sum (X_{i} - \overline{X})^{2}}{\tilde{\theta}} \stackrel{H_{0}}{\sim} \chi^{2}_{n - 1} $
+\item $ \frac{SS_{Y}}{\tilde{\theta}} = \frac{\sum (Y_{i} - \overline{Y})^{2}}{\tilde{\theta}} \stackrel{H_{0}}{\sim} \chi^{2}_{m - 1} $
+\end{itemize}
+
+Quindi
+
+$ \mathcal{F} = \frac{\frac{SS_{X}}{n - 1}}{\frac{SS_{Y}}{m - 1}} = \frac{S_{X}^{2}}{S_{Y}^{2}} \stackrel{H_{0}}{\sim} F_{n - 1, m - 1} $
+
+\begin{itemize}
+\item $ H_{0}' : \frac{\theta_{3}}{\theta_{4}} = 1 $ equivalente a $ H_{0} $
+\item $ H_{1}' : \frac{\theta_{3}}{\theta_{4}} \ne 1 $ equivalente a $ H_{1} $
+\end{itemize}
+
+$ f(\underline{x}, \underline{y}) = \frac{\frac{1}{n - 1} \sum (X_{i} - \overline{X})^{2}}{} = \mathcal{F} $
+
+Si ha che
+
+$ \lambda =  $ % TODO: CONTROLLARE COSA MANCA!
+
+
+$\lambda \le \lambda_{0} \iff g(f(\underline{x}, \underline{y})) \le c $. Si osserva che $ g(0) = 0 $ e $ \lim\limits_{f \to \infty} g(f) = 0 $. Dato che $ \frac{\mathrm{d}g}{\mathrm{d}f} = 0 \implies \max g $ si realizza in $ f_{M} = \frac{n(m - 1)}{m (n - 1)} $
+
+% TODO: grafico
+
+$ g(f(\underline{x}, \underline{y})) \le c \iff f(\underline{x}, \underline{y}) \le c_{1} \lor f(\underline{x}, \underline{y}) \ge c_{2} $. Rigetto quindi $ H_{0} $ se $ \mathcal{F} \le c_{1} \lor \mathcal{F} \ge c_{2} $ con $ \mathbb{P}_{H_{0}} (\mathcal{F} \le c_{1} \lor \mathcal{F} \ge c_{2}) = \alpha $
+
+% TODO: Grafico
+
+Suppongo che $ \frac{SS_{X}}{n - 1} $
+
+% TODO: CONTROLLARE COSA MANCA!
+
+\subsection{Contronto di medie eteroschedastico}
+
+Siano:
+\begin{itemize}
+\item $ X_{1}, \dotsc, X_{n} \sim N(\mu_{1}, \sigma_{1}^{2}) $
+\item $ Y_{1}, \dotsc, Y_{n} \sim N(\mu_{2}, \sigma_{2}^{2}) $
+\end{itemize}
+
+e si testi:
+\begin{itemize}
+\item $ H_{0}: \mu_{1} = \mu_{2} $
+\item $ H_{1}: \mu_{1} \ne \mu_{2} $ ($ \mu_{1} < \mu_{2} \lor \mu_{1} > \mu_{2} $)
+\end{itemize}
+
+Allora
+\begin{itemize}
+\item Se i dati sono normali si usa
+\[ T_{2} = \frac{\overline{X} - \overline{Y}}{\sqrt{\frac{S_{X}^{2}}{n_{1}} + \frac{S_{Y}^{2}}{n_{2}}}} \stackrel{H_{0}}{\sim} t_{r} \]
+
+con
+
+\[ r = \frac{\left( \frac{S_{X}^{2}}{n_{1}} + \frac{S_{Y}^{2}}{n_{2}} \right)^{2}}{\frac{1}{n_{1} - 1} \left( \frac{S_{X}^{2}}{n_{1}} \right)^{2} + \frac{1}{n_{2} - 1} \left( \frac{S_{Y}^{2}}{n_{2}} \right)^{2}} \]
+
+\item Se i dati non sono normali ma $ n_{1}, n_{2} \ge 50 $ (cio\`e un numero abbastanza grande) si considera $ T_{2} \sim N(0,1) $.
+\end{itemize}
+
+\subsection{Contronto di medie tra campioni accoppiati} 
+Siano:
+\begin{itemize}
+\item $ X_{1} $ la variabile aleatoria che calcola la pressione prima di un trattamento $ \leadsto \mathbb{E} [X_{1}] = \mu_{1} $
+\item $ X_{2} $ la variabile aleatoria che calcola la pressione dopo un trattamento $ \leadsto \mathbb{E} [X_{2}] = \mu_{2} $
+\end{itemize}
+
+Si ha quindi un campione $ (X_{1}^{i}, X_{2}^{i}) $ con $ i = 1, \dotsc, n $. Si imposta ora il seguente test:
+
+\begin{itemize}
+\item $ H_{0} : \mu_{1} = \mu_{2} $
+\item $ H_{1} : \mu_{1} \ne \mu_{2} $
+\end{itemize}
+
+Si consideri la differenza $ Y^{i} = X_{1}^{i} - X_{2}^{i}, \forall\ i = 1, \dotsc, n $. Allora $ \mathbb{E} [Y^{i}] = \mathbb{E} [X_{1}^{i} - X_{2}^{i}] = \mathbb{E} [X_{1}^{i}] - \mathbb{E} [X_{2}^{i}] = \mu_{1} - \mu_{2} \eqdef \mu_{0} $.
+
+Il test quindi diventa
+\begin{itemize}
+\item $ H_{0} : \mu_{0} = 0 $
+\item $ H_{1} : \mu_{0} \ne 0 $
+\end{itemize}
+
+Normalizzando si ha che
+
+\[ \frac{\overline{Y} - 0}{\frac{\sigma_{Y}}{\sqrt{n}}} \sim N(0,1) \]
+
+Se $ \sigma_{Y} $ va stimato allora $ S_{Y}^{2} = \frac{1}{n - 1} \sum\limits_{i = 1}^{n} (Y_{i} - \overline{Y}_{n})^{2} \implies T = \frac{\overline{Y}}{\sqrt{\frac{S_{Y}^{2}}{n}}} \stackrel{H_{0}}{\sim} t_{n - 1} $
+\begin{defn}
+\end{defn}
+
+\section{Analisi della varianza (ANOVA)}
+\subsection{ANOVA a un fattore}
+Si consideri $ b $ variabili aleatorie $ X_{1}, \dotsc, X_{b} $ indipendenti ma \underline{non} identicamente distribuite, con
+
+\[ X_{j} \sim N(\mu_{j}, \sigma^{2}), j = 1, \dotsc, b \]
+
+dove:
+\begin{itemize}
+\item $ \mu_{j} $ sono medie diverse;
+\item $ \sigma^{2}_{j} = \sigma^{2} $ hanno la stessa varianza (caso omoscedastico)
+\end{itemize}
+
+Di ogni $ X_{j} $ si possiede un campione i.i.d.:
+
+\[ X_{1j}, \dotsc, X_{aj}, j = 1, \dotsc, b \]
+
+dove la dimensione del campione \`e la stessa per ogni $ X_{j} $.
+
+Si vuole verificare
+\begin{itemize}
+\item $ H_{0}: \mu_{1} = \mu_{2} = \dotsb = \mu_{b} (= \mu) $
+\item $ H_{1}: $ tutte le alternative
+\end{itemize}
+
+I parametri incogniti sono $ \underline{\theta} = (\mu_{1}, \dotsc, \mu_{b}, \sigma^{2}) \in \mathcal{H} = \underbrace{\mathbb{R} \times \dotsb \times \mathbb{R}}_{b} \times \mathbb{R}^{+} $ e l'insieme in cui varia $ \underline{\theta} $ \`e $ \mathcal{H}_{0} = \{ \underline{\theta} \in \mathcal{H} : \mu_{1} = \dotsb = \mu_{b} \} $. Si utilizzi il metodo del rapporto di massima verosimiglianza:
+
+\begin{itemize}
+\item $ L_{\mathcal{H}} (\underline{\mu}, \sigma^{2}; x_{ij}) = \left( \frac{1}{2 \pi \sigma^{2}} \right)^{\frac{ab}{2}} e^{- \frac{1}{2 \sigma^{2}} \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \mu_{j})^{2}} $
+\item $ L_{\mathcal{H}_{0}} (\underline{\mu}, \sigma^{2}; x_{ij}) = \left( \frac{1}{2 \pi \sigma^{2}} \right)^{\frac{ab}{2}} e^{- \frac{1}{2 \sigma^{2}} \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \mu)^{2}} $
+\end{itemize}
+
+Massimizzando si ottiene:
+\begin{itemize}
+\item $ \mathcal{H}: \begin{cases} \hat{\hat{\mu}}_{j} = \frac{1}{a} \sum\limits_{i = 1}^{a} x_{ij} \eqdef \overline{x}_{\cdot j} & j = 1, \dotsc, b \text{ (media all'interno dei gruppi)} \\ \hat{\hat{\sigma}}^{2} = \frac{1}{ab} \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot j})^{2} & \text{(somma degli scarti quadratici all'interno dei gruppi)} \end{cases} $
+\item $ \mathcal{H}_{0}: \begin{cases} \hat{\mu}_{j} = \frac{1}{ab} \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} x_{ij} \eqdef \overline{x}_{\cdot \cdot} & j = 1, \dotsc, b \text{ (media totale)} \\ \hat{\sigma}^{2} = \frac{1}{ab} \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot \cdot})^{2} & \text{(somma degli scarti quadratici totali)} \end{cases} $
+\end{itemize}
+
+Sostituendo in $ L_{\mathcal{H}} $ e $ L_{\mathcal{H}_{0}} $ si ottiene il rapporto di massima verosimiglianza
+
+\[ \lambda(x_{ij}) = \frac{L_{\mathcal{H}_{0}} (\underline{\hat{\mu}}, \hat{\sigma}^{2}; x_{ij})}{L_{\mathcal{H}} (\hat{\hat{\underline{\mu}}}, \hat{\hat{\sigma}}^{2}; x_{ij})} = \frac{\left( \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot j})^{2} \right)^{\frac{ab}{2}}}{\left( \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot \cdot})^{2} \right)^{\frac{ab}{2}}} \]
+
+Rigetto $ H_{0} $ se $ \lambda < \lambda_{0} \iff \lambda^{\frac{2}{ab}} < \lambda_{0}^{\frac{2}{ab}} \eqdef \lambda_{0}' $
+
+Si impone che sia $ \lambda $ il livelllo di significativit\`a
+
+\[ \sup\limits_{\underline{\theta} \in \mathcal{H}_{0}} \mathbb{P}_{\underline{\theta}} \left( \frac{\sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot j})^{2}}{\sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot \cdot})^{2}} < \lambda_{0}' \right) = \alpha \]
+
+Si studi la distribuzione di $ \frac{\sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot j})^{2}}{\sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot \cdot})^{2}} $. Si osservi che, sotto l'ipotesi $ H_{0} $
+
+\[ Q \defeq \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot \cdot})^{2} = \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot j})^{2} + a \sum\limits_{j = 1}^{b} (\overline{x}_{\cdot j} - \overline{x}_{\cdot \cdot})^{2} \]
+
+e poste
+
+\begin{itemize}
+\item $ Q_{3} \defeq \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot j})^{2} $
+\item $ Q_{4} \defeq a \sum\limits_{j = 1}^{b} (\overline{x}_{\cdot j} - \overline{x}_{\cdot \cdot})^{2} $
+\end{itemize}
+
+si ha quindi che $ Q = Q_{3} + Q_{4} $. Si noti che
+\begin{itemize}
+\item $ Q $ \`e la somma degli scarti totali ($ SS_{TOT} $)
+\item $ Q_{3} $ \`e la somma degli scarti all'interno dei gruppi o somma degli "errori" ($ SS_{E} $)
+\item $ Q_{4} $ \`e la somma degli scarti tra i gruppi e la media totale ($ SS_{T} $)
+\end{itemize}
+
+Si ha quindi che $ \frac{\sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot j})^{2}}{\sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot \cdot})^{2}} = \frac{Q_{3}}{Q} $ ma si prova che $ Q_{3} $ e $ Q $ non sono indipendenti mentre $ Q_{3} $ e $ Q_{4} $ lo sono. Inoltre
+
+\begin{itemize}
+\item $ \frac{Q_{3}}{\sigma^{2}} = \sum\limits_{j = 1}^{b} \left( \sum\limits_{i = 1}^{a} \frac{(x_{ij} - \overline{x}_{\cdot j})^{2}}{\sigma^{2}} \right) = \sum\limits_{i = 1}^{b} \frac{(a - 1)}{\sigma^{2}} S_{j}^{2} = \sum\limits_{j = 1}^{b} \chi^{2}_{a  - 1} \stackrel{\footnotemark[1]}{\sim} \chi^{2}_{b(a - 1)} $
+\item $ \frac{Q}{\sigma^{2}} \stackrel{H_{0}}{=} \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} \frac{(x_{ij} - \overline{x}_{\cdot \cdot})^{2}}{\sigma^{2}} = \frac{(ab - 1)}{\sigma^{2}} S_{TOT}^{2} \stackrel{H_{0}}{\sim} \chi^{2}_{ab - 1} $
+\end{itemize}
+\footnotetext[1]{Le $ \chi^{2}_{a - 1} $ sono indipendenti poich\'e le $ X_{j} $ sono indipendenti tra loro.}
+
+dove:
+\begin{itemize}
+\item $ S_{j}^{2} $ \`e la varianza campionaria non distorta del campione per $ X_{j} \sim N(\mu_{j}, \sigma^{2}) $
+\item $ S_{TOT}^{2} $ \`e la varianza campionaria non distorta del campione formato da \underline{tutte} le $ X_{ij} \sim N(\mu, \sigma^{2}) $ i.i.d.
+\end{itemize}
+
+Poich\'e $ Q = Q_{3} + Q_{4} $ allora $ \underbrace{\frac{Q}{\sigma^{2}}}_{\chi^{2}_{ab - 1}} = \underbrace{\frac{Q_{3}}{\sigma^{2}}}_{\chi^{2}_{b(a - 1)}} + \frac{Q_{4}}{\sigma^{2}} $ e per differenza si ha che $ \frac{Q_{4}}{\sigma^{2}} \stackrel{H_{0}}{\sim} \chi^{2}_{ab - 1 - b(a - 1)} = \chi^{2}_{b - 1} $ allora $ \frac{\sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot j})^{2}}{\sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot \cdot})^{2}} = \frac{Q_{3}}{Q} = \frac{Q_{3}}{Q_{3} + Q_{4}} = \frac{1}{1 + \frac{Q_{4}}{Q_{3}}} $ per cui 
+
+\[ \frac{\sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot j})^{2}}{\sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot \cdot})^{2}} < \lambda_{0}' \iff \frac{Q_{4}}{Q_{3}} > \frac{1 - \lambda_{0}'}{\lambda_{0}'} \eqdef \lambda_{1} \iff \mathcal{F} = \frac{\frac{Q_{4}}{b - 1}}{\frac{Q_{3}}{b(a - 1)}} > \lambda_{1} \frac{b(a - 1)}{b - 1} \eqdef c \]
+
+La statistica $ \mathcal{F} $ ha distribuzione $ F_{b - 1, b(a - 1)}, \forall\ \underline{\theta} \in \mathcal{H}_{0} $, dunque basta imporre $ \alpha = \mathbb{P}_{H_{0}} (\mathcal{F} > c) $ e rigettare $ H_{0} $ se $ \mathcal{F} > c $ con $ c $ tale che $ \phi_{F_{b - 1, b(a - 1)}} (c) = 1 - \alpha $
+
+\begin{figure}[H]
+\begin{tikzpicture}[yscale=5]
+\draw[->] (-1, 0) -- (3, 0);
+\draw[->] (0, -0.2) -- (0, 0.4);
+\draw[domain=0:3, smooth, variable=\x, black] plot ({\x}, {2*\x/(8*\x*\x*\x + 12*\x*\x + 6*\x + 1)}) node[above] {$ F_{1, 6} $};
+\draw[dotted] (0.7, 0.101) -- (0.7, 0) node[below] {$ c $};
+\filldraw[pattern=north east lines, pattern color=black!20, domain=0.7:3, smooth, variable=\x] plot ({\x}, {2*\x/(8*\x*\x*\x + 12*\x*\x + 6*\x + 1)}) -| (3, 0) -| (0.7, 0) -- cycle;
+\draw (1, 0.04) node {$ \alpha $};
+\end{tikzpicture}
+\end{figure}
+
+\subsection{ANOVA a due fattori con una osservazione per cella}
+Si supponga che l'esito di un esperimento sia influenzato da 2 fattori $ A $ e $ B $.
+
+\begin{es}
+\noindent
+\begin{itemize}
+\item La crescita di una pianta pu\`o essere influenzata dal tipo di seme e dal tipo di fertilizzante usati e si hanno pi\`u scelte possibili per seme e fertilizzante;
+\item Il contenuto medio di un principio attivo in un farmaco (pastiglia, bustina, \ldots) pu\`o essere influenzato dallo stabilimento di produzione e dal giorno di produzione.
+\end{itemize}
+\end{es}
+
+Sia $ X_{ij} $ l'esito dell'esperimento (v.a.) effettuato quando il fattore $ A $ "vale $ i $" e $ B $ "vale $ j $" con $ i = 1, \dotsc, a $ e $ j = 1, \dotsc, b $. Si supponga che
+
+\[ \mathbb{E}[X_{ij}] = \mu_{ij} = \mu + \alpha_{i} + \beta_{j} \]
+
+con $ i = 1, \dotsc, a $ e $ j = 1, \dotsc, b $ dove
+
+\begin{itemize}
+\item $ \mu $ \`e il contributo globale indipendente da $ A $ e $ B $;
+\item $ \alpha_{i} $ \`e il contributo di $ A $;
+\item $ \beta_{j} $ \`e il contributo di $ B $.
+\end{itemize}
+
+e si supponga che
+
+\begin{equation} \label{equation:dot}
+\sum\limits_{i = 1}^{a} \alpha_{i} = \sum\limits_{j = 1}^{b} \beta_{j} = 0
+\end{equation}
+
+Si noti che si pu\`o sempre assumere che $ (\ref{equation:dot}) $ valga. Infatti, se non valesse, basta porre:
+
+\begin{itemize}
+\item $ \overline{\alpha} \defeq \sum\limits_{i = 1}^{n} \frac{\alpha_{i}}{a} $
+\item $ \overline{\beta} \defeq \sum\limits_{j = 1}^{n} \frac{\beta_{j}}{b} $
+\end{itemize}
+
+e si ha
+
+\[ \mu_{ij} = \underbrace{\mu + \overline{\alpha} + \overline{\beta}}_{\mu'} + \underbrace{\alpha_{i} - \overline{\alpha}}_{\alpha_{i}'} + \underbrace{\beta_{j} - \overline{\beta}}_{\beta_{j}'}  \]
+
+e ora $ \sum\limits_{i = 1}^{a} \alpha_{i}' = \sum\limits_{i = 1}^{n} \alpha_{i} - a \overline{\alpha} = 0 $ e analogamente $ \sum\limits_{j = 1}^{n} \beta_{j}' = 0 $. Si assumi inoltre che le $ X_{ij} \sim N(\mu_{ij}, \sigma^{2}), \forall\ i, j $ e che siano indipendenti.
+
+Il modello descritto si dice ANOVA a due fattori con una osservazione per cella, poich\'e per ogni coppia o cella $ (i, j) $ si suppone di avere a disposizione l'esito $ X_{ij} $ di un solo esperimento.
+
+Ci si chiede ora se uno dei fattori influenzi davvero l'esito dell'esperimento, ad esempio il fattore $ B $. Ci\`o equivale a verificare:
+
+\begin{itemize}
+\item $ H_{0}: \beta_{j} = 0, \forall\ j = 1, \dotsc, b $
+\item $ H_{1}: \beta_{j} \ne 0 $ per qualche $ j $
+\end{itemize}
+
+I parametri incogniti sono $ \underline{\theta} = (\mu, \underline{\alpha}, \underline{\beta}, \sigma^{2}) \in \mathcal{H} = \mathbb{R} \times \mathbb{R}^{a} \times \mathbb{R}^{b} \times \mathbb{R}^{+} $ e l'insieme in cui varia $ \underline{\theta} $ \`e $ \mathcal{H}_{0} = \{ \underline{\theta} \in \mathcal{H} : \beta_{1} = \dotsb = \beta_{b} = 0 \} $. Si utilizzi ancora il metodo del rapporto di massima verosimiglianza:
+
+\begin{itemize}
+\item $ L_{\mathcal{H}} (\mu, \underline{\alpha}, \underline{\beta}, \sigma^{2}; x_{ij}) = \left( \frac{1}{2 \pi \sigma^{2}} \right)^{\frac{ab}{2}} e^{- \frac{1}{2 \sigma^{2}} \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \mu - \alpha_{i} - \beta_{j})^{2}} $
+\item $ L_{\mathcal{H}_{0}} (\mu, \underline{\alpha}, \underline{0}, \sigma^{2}; x_{ij}) = \left( \frac{1}{2 \pi \sigma^{2}} \right)^{\frac{ab}{2}} e^{- \frac{1}{2 \sigma^{2}} \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \mu - \alpha_{i})^{2}} $
+\end{itemize}
+
+Massimizzando si ottiene:
+\begin{itemize}
+\item $ \mathcal{H}: \begin{cases} \hat{\hat{\mu}} = \overline{x}_{\cdot \cdot} \\ \hat{\hat{\alpha}}_{i} = \overline{x}_{i \cdot} - \overline{x}_{\cdot \cdot} & i = 1, \dotsc, a  \\ \hat{\hat{\beta}}_{j} = \overline{x}_{\cdot j} - \overline{x}_{\cdot \cdot} & j = 1, \dotsc, b \\ \hat{\hat{\sigma}}^{2} = \frac{1}{ab} \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{i \cdot} - \overline{x}_{\cdot j} + \overline{x}_{\cdot \cdot})^{2} \end{cases} $
+\item $ \mathcal{H}_{0}: \begin{cases} \hat{\mu} = \overline{x}_{\cdot \cdot} \\ \hat{\alpha}_{i} = \overline{x}_{i \cdot} - \overline{x}_{\cdot \cdot} & i = 1, \dotsc, a \\ \hat{\beta}_{j} = 0 & j = 1, \dotsc, b \\ \hat{\sigma}^{2} = \frac{1}{ab} \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{i \cdot})^{2} \eqdef \frac{1}{ab} Q_{2} \end{cases} $
+\end{itemize}
+
+Sostituendo e calcolando il rapporto di massima verosimiglianza si ha
+
+\[ \lambda (X_{ij}) = \left( \frac{\hat{\hat{\sigma}}^{2}}{\hat{\sigma}^{2}} \right)^{\frac{ab}{2}} = \left( \frac{Q_{5}}{Q_{2}} \right)^{\frac{ab}{2}} \]
+
+Rigetto $ H_{0} $ se $ \lambda (x_{ij}) < \lambda_{0} \iff \frac{\hat{\hat{\sigma}}^{2}}{\hat{\sigma}^{2}} < \lambda_{0}^{\frac{2}{ab}} \eqdef c $ con $ \sup\limits_{\underline{\theta} \in \mathcal{H}_{0}} \mathbb{P}_{\underline{\theta}} \left( \frac{\hat{\hat{\sigma}}^{2}}{\hat{\sigma}^{2}} < c \right) = \alpha $.
+
+Si studi la distribuzione di $ \frac{\hat{\hat{\sigma}}^{2}}{\hat{\sigma}^{2}} $. Detti:
+\begin{itemize}
+\item $ Q_{4} = a \sum\limits_{j = 1}^{b} (\overline{x}_{\cdot j} - \overline{x}_{\cdot \cdot})^{2} $
+\item $ Q_{5} = \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (\overline{x}_{i j} - \overline{x}_{i \cdot} - \overline{x}_{\cdot j} + \overline{x}_{\cdot \cdot})^{2} $
+\item $ Q_{2} = Q_{4} + Q_{5} $
+\end{itemize}
+
+si noti che
+\[ \frac{\hat{\hat{\sigma}}^{2}}{\hat{\sigma}^{2}} = \frac{1}{1 + \frac{Q_{4}}{Q_{5}}} \]
+
+In modo analogo al caso precedente si prova che, se $ H_{0} $ \`e vera, $ \frac{Q_{4}}{\sigma^{2}} \sim \chi^{2}_{b - 1} $ e $ \frac{Q_{5}}{\sigma^{2}} \sim \chi^{2}_{(a - 1)(b - 1)} $. Inoltre, $ Q_{4} $ e $ Q_{5} $ sono indipendenti, quindi, $ \forall\ \underline{\theta} \in \mathcal{H}_{0} $
+
+\[ \tilde{\mathcal{F}} = \frac{\frac{Q_{4}}{b - 1}}{\frac{Q_{5}}{(a - 1)(b - 1)}} \stackrel{H_{0}}{\sim} F_{b - 1, (a - 1)(b - 1)} \]
+
+Quindi $ \alpha = \mathbb{P}_{H_{0}} \left( \frac{\hat{\hat{\sigma}}^{2}}{\hat{\sigma}^{2}} < c \right) = \mathbb{P}_{H_{0}} \left( \tilde{\mathcal{F}} > c_{1} \right) $ e $ c_{1} $ \`e tale che $ \phi_{F_{b - 1, (a - 1)(b - 1)}} (c_{1}) = 1 - \alpha $
+
+\begin{center}
+\begin{figure}[H]
+\begin{tikzpicture}[yscale=5]
+\draw[->] (-1, 0) -- (3, 0);
+\draw[->] (0, -0.2) -- (0, 0.4);
+\draw[domain=0:3, smooth, variable=\x, black] plot ({\x}, {2*\x/(8*\x*\x*\x + 12*\x*\x + 6*\x + 1)}) node[above] {$ F_{1, 6} $};
+\draw[dotted] (0.7, 0.101) -- (0.7, 0) node[below] {$ c_{1} $};
+\filldraw[pattern=north east lines, pattern color=black!20, domain=0.7:3, smooth, variable=\x] plot ({\x}, {2*\x/(8*\x*\x*\x + 12*\x*\x + 6*\x + 1)}) -| (3, 0) -| (0.7, 0) -- cycle;
+\draw (1, 0.04) node {$ \alpha $};
+\end{tikzpicture}
+\caption{Grafico di $ F_{b - 1, (a - 1)(b - 1)} $ con coda che parte da $ c_{1} $ e di area $ \alpha $ tagliata}
+\end{figure}
+\end{center}
+
+\subsection{ANOVA a due fattori con pi\`u di una osservazione per cella}
+Si supponga ora che per ogni cella $ (i, j) $ siano disponibili gli esiti di $ c $ esperimenti
+
+\[ X_{ijk} \sim N(\mu_{ij}, \sigma^{2}) \]
+
+indipendenti tra loro, con $ i = 1, \dotsc, a $, $ j = 1, \dotsc, b $ e $ k = 1, \dotsc, c $. Si possono ora stimare i parametri di un modello pi\`u complesso:
+
+\[ \mathbb{E}[X_{ijk}] = \mu_{ij} = \mu + \alpha_{i} + \beta_{j} + \gamma_{ij} \]
+
+dove $ \gamma_{ij} $ rappresenta l'interazione tra i fattori $ A $ e $ B $, con
+\begin{itemize}
+\item $ \sum\limits_{i = 1}^{a} \alpha_{i} = 0 $
+\item $ \sum\limits_{j = 1}^{b} \beta_{j} = 0 $
+\item $ \sum\limits_{i = 1}^{a} \gamma_{ij} = \sum\limits_{j = 1}^{b} \gamma_{ij} = 0 $
+\end{itemize}
+
+Si studi
+\begin{itemize}
+\item $ H_{0}: \gamma_{ij} = 0, \forall\ i, j $
+\item $ H_{1}: \gamma_{ij} \ne 0 $ per qualche $ (i, j) $
+\end{itemize}
+
+con un procedimento simile ai precedenti si trova che
+
+\[ \tilde{\tilde{\mathcal{F}}} = \frac{\frac{c \sum\limits_{i = 1}^{a} \sum\limits_{j = 1}^{b} (\overline{x}_{i j \cdot} - \overline{x}_{i \cdot \cdot} - \overline{x}_{\cdot j \cdot} + \overline{x}_{\cdot \cdot \cdot})^{2}}{(a - 1)(b - 1)}}{\frac{\sum\limits_{k = 1}^{c} \sum\limits_{i = 1}^{a} \sum\limits_{j = 1}^{b} (x_{ijk} - \overline{x}_{i j \cdot})^{2}}{ab (c - 1)}} \]
+
+$ \tilde{\tilde{\mathcal{F}}} \stackrel{H_{0}}{\sim} F_{(a - 1)(b - 1), ab(c - 1)}, \forall\ \underline{\theta} \in \mathcal{H}_{0} $ quindi rigetto $ H_{0} $ se $ \tilde{\tilde{\mathcal{F}}} > c $ con $ \mathbb{P}_{H_{0}} (\tilde{\tilde{\mathcal{F}}} > c) = \alpha $ 
+
+
+\begin{es}
+\end{es}
+
+\begin{es}
+\end{es}
+
+\begin{oss}
+\end{oss}
+
+\begin{thm}
+\end{thm}
+
+\begin{proof}
+\end{proof}
+
+\begin{itemize}
+\item 
+\end{itemize}
+
+\begin{enumerate}
+\item 
+\end{enumerate}
+
+\end{document}

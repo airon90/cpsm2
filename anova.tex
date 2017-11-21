@@ -1,0 +1,286 @@
+\documentclass[hidelinks, 10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{gensymb}
+\usepackage{bbm}
+\usepackage{marvosym}
+\usepackage{xcolor}
+\usepackage{blindtext}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{cancel}
+\usepackage{breqn}
+\usepackage{verbatim}
+\usepackage{mathtools}
+\usepackage{epsfig}
+\usepackage{epstopdf}
+\usepackage{titling}
+\usepackage{url}
+\usepackage{array}
+\usepackage{tikz}
+% \usepackage[a4paper]{geometry}
+
+\usetikzlibrary{arrows, automata, backgrounds, calendar, chains, matrix, mindmap, patterns, petri, shadows, shapes.geometric, shapes.misc, spy, trees}
+
+\author{Alessandra Micheletti}
+\date{A.A. 2017-2018}
+\title{Analisi della varianza (ANOVA)}
+
+\DeclareMathOperator{\var}{var}
+\DeclareMathOperator{\cov}{cov}
+
+\begin{document}
+\newcommand{\defeq}{\vcentcolon=}
+\newcommand{\eqdef}{=\vcentcolon}
+\providecommand{\ML}[1]{\hat{#1}_{\text{ML}}}
+\providecommand{\compl}[1]{\prescript{c}{}{#1}}
+
+\theoremstyle{plain}
+\newtheorem{thm}{Teorema}[]
+
+\theoremstyle{definition}
+\newtheorem{defn}[]{Definizione}
+\newtheorem{prop}[]{Proposizione}
+\newtheorem{cor}[]{Corollario}
+\newtheorem{lem}[]{Lemma}
+\newtheorem{oss}[]{Osservazione}
+\newtheorem{nota}[]{Nota}
+\newtheorem{es}[]{Esempio}
+\newtheorem{ex}[]{Esercizio}
+
+
+\maketitle
+
+\section{ANOVA a un fattore}
+Si consideri $ b $ variabili aleatorie $ X_{1}, \dotsc, X_{b} $ indipendenti ma \underline{non} identicamente distribuite, con
+
+\[ X_{j} \sim N(\mu_{j}, \sigma^{2}), j = 1, \dotsc, b \]
+
+dove:
+\begin{itemize}
+\item $ \mu_{j} $ sono medie diverse;
+\item $ \sigma^{2}_{j} = \sigma^{2} $ hanno la stessa varianza (caso omoscedastico)
+\end{itemize}
+
+Di ogni $ X_{j} $ si possiede un campione i.i.d.:
+
+\[ X_{1j}, \dotsc, X_{aj}, j = 1, \dotsc, b \]
+
+dove la dimensione del campione \`e la stessa per ogni $ X_{j} $.
+
+Si vuole verificare
+\begin{itemize}
+\item $ H_{0}: \mu_{1} = \mu_{2} = \dotsb = \mu_{b} (= \mu) $
+\item $ H_{1}: $ tutte le alternative
+\end{itemize}
+
+I parametri incogniti sono $ \underline{\theta} = (\mu_{1}, \dotsc, \mu_{b}, \sigma^{2}) \in \mathcal{H} = \underbrace{\mathbb{R} \times \dotsb \times \mathbb{R}}_{b} \times \mathbb{R}^{+} $ e l'insieme in cui varia $ \underline{\theta} $ \`e $ \mathcal{H}_{0} = \{ \underline{\theta} \in \mathcal{H} : \mu_{1} = \dotsb = \mu_{b} \} $. Si utilizzi il metodo del rapporto di massima verosimiglianza:
+
+\begin{itemize}
+\item $ L_{\mathcal{H}} (\underline{\mu}, \sigma^{2}; x_{ij}) = \left( \frac{1}{2 \pi \sigma^{2}} \right)^{\frac{ab}{2}} e^{- \frac{1}{2 \sigma^{2}} \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \mu_{j})^{2}} $
+\item $ L_{\mathcal{H}_{0}} (\underline{\mu}, \sigma^{2}; x_{ij}) = \left( \frac{1}{2 \pi \sigma^{2}} \right)^{\frac{ab}{2}} e^{- \frac{1}{2 \sigma^{2}} \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \mu)^{2}} $
+\end{itemize}
+
+Massimizzando si ottiene:
+\begin{itemize}
+\item $ \mathcal{H}: \begin{cases} \hat{\hat{\mu}}_{j} = \frac{1}{a} \sum\limits_{i = 1}^{a} x_{ij} \eqdef \overline{x}_{\cdot j} & j = 1, \dotsc, b \text{ (media all'interno dei gruppi)} \\ \hat{\hat{\sigma}}^{2} = \frac{1}{ab} \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot j})^{2} & \text{(somma degli scarti quadratici all'interno dei gruppi)} \end{cases} $
+\item $ \mathcal{H}_{0}: \begin{cases} \hat{\mu}_{j} = \frac{1}{ab} \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} x_{ij} \eqdef \overline{x}_{\cdot \cdot} & j = 1, \dotsc, b \text{ (media totale)} \\ \hat{\sigma}^{2} = \frac{1}{ab} \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot \cdot})^{2} & \text{(somma degli scarti quadratici totali)} \end{cases} $
+\end{itemize}
+
+Sostituendo in $ L_{\mathcal{H}} $ e $ L_{\mathcal{H}_{0}} $ si ottiene il rapporto di massima verosimiglianza
+
+\[ \lambda(x_{ij}) = \frac{L_{\mathcal{H}_{0}} (\underline{\hat{\mu}}, \hat{\sigma}^{2}; x_{ij})}{L_{\mathcal{H}} (\hat{\hat{\underline{\mu}}}, \hat{\hat{\sigma}}^{2}; x_{ij})} = \frac{\left( \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot j})^{2} \right)^{\frac{ab}{2}}}{\left( \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot \cdot})^{2} \right)^{\frac{ab}{2}}} \]
+
+Rigetto $ H_{0} $ se $ \lambda < \lambda_{0} \iff \lambda^{\frac{2}{ab}} < \lambda_{0}^{\frac{2}{ab}} \eqdef \lambda_{0}' $
+
+Si impone che sia $ \lambda $ il livelllo di significativit\`a
+
+\[ \sup\limits_{\underline{\theta} \in \mathcal{H}_{0}} \mathbb{P}_{\underline{\theta}} \left( \frac{\sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot j})^{2}}{\sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot \cdot})^{2}} < \lambda_{0}' \right) = \alpha \]
+
+Si studi la distribuzione di $ \frac{\sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot j})^{2}}{\sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot \cdot})^{2}} $. Si osservi che, sotto l'ipotesi $ H_{0} $
+
+\[ Q \defeq \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot \cdot})^{2} = \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot j})^{2} + a \sum\limits_{j = 1}^{b} (\overline{x}_{\cdot j} - \overline{x}_{\cdot \cdot})^{2} \]
+
+e poste
+
+\begin{itemize}
+\item $ Q_{3} \defeq \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot j})^{2} $
+\item $ Q_{4} \defeq a \sum\limits_{j = 1}^{b} (\overline{x}_{\cdot j} - \overline{x}_{\cdot \cdot})^{2} $
+\end{itemize}
+
+si ha quindi che $ Q = Q_{3} + Q_{4} $. Si noti che
+\begin{itemize}
+\item $ Q $ \`e la somma degli scarti totali ($ SS_{TOT} $)
+\item $ Q_{3} $ \`e la somma degli scarti all'interno dei gruppi o somma degli "errori" ($ SS_{E} $)
+\item $ Q_{4} $ \`e la somma degli scarti tra i gruppi e la media totale ($ SS_{T} $)
+\end{itemize}
+
+Si ha quindi che $ \frac{\sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot j})^{2}}{\sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot \cdot})^{2}} = \frac{Q_{3}}{Q} $ ma si prova che $ Q_{3} $ e $ Q $ non sono indipendenti mentre $ Q_{3} $ e $ Q_{4} $ lo sono. Inoltre
+
+\begin{itemize}
+\item $ \frac{Q_{3}}{\sigma^{2}} = \sum\limits_{j = 1}^{b} \left( \sum\limits_{i = 1}^{a} \frac{(x_{ij} - \overline{x}_{\cdot j})^{2}}{\sigma^{2}} \right) = \sum\limits_{i = 1}^{b} \frac{(a - 1)}{\sigma^{2}} S_{j}^{2} = \sum\limits_{j = 1}^{b} \chi^{2}_{a  - 1} \stackrel{\footnotemark[1]}{\sim} \chi^{2}_{b(a - 1)} $
+\item $ \frac{Q}{\sigma^{2}} \stackrel{H_{0}}{=} \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} \frac{(x_{ij} - \overline{x}_{\cdot \cdot})^{2}}{\sigma^{2}} = \frac{(ab - 1)}{\sigma^{2}} S_{TOT}^{2} \stackrel{H_{0}}{\sim} \chi^{2}_{ab - 1} $
+\end{itemize}
+\footnotetext[1]{Le $ \chi^{2}_{a - 1} $ sono indipendenti poich\'e le $ X_{j} $ sono indipendenti tra loro.}
+
+dove:
+\begin{itemize}
+\item $ S_{j}^{2} $ \`e la varianza campionaria non distorta del campione per $ X_{j} \sim N(\mu_{j}, \sigma^{2}) $
+\item $ S_{TOT}^{2} $ \`e la varianza campionaria non distorta del campione formato da \underline{tutte} le $ X_{ij} \sim N(\mu, \sigma^{2}) $ i.i.d.
+\end{itemize}
+
+Poich\'e $ Q = Q_{3} + Q_{4} $ allora $ \underbrace{\frac{Q}{\sigma^{2}}}_{\chi^{2}_{ab - 1}} = \underbrace{\frac{Q_{3}}{\sigma^{2}}}_{\chi^{2}_{b(a - 1)}} + \frac{Q_{4}}{\sigma^{2}} $ e per differenza si ha che $ \frac{Q_{4}}{\sigma^{2}} \stackrel{H_{0}}{\sim} \chi^{2}_{ab - 1 - b(a - 1)} = \chi^{2}_{b - 1} $ allora $ \frac{\sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot j})^{2}}{\sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot \cdot})^{2}} = \frac{Q_{3}}{Q} = \frac{Q_{3}}{Q_{3} + Q_{4}} = \frac{1}{1 + \frac{Q_{4}}{Q_{3}}} $ per cui 
+
+\[ \frac{\sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot j})^{2}}{\sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{\cdot \cdot})^{2}} < \lambda_{0}' \iff \frac{Q_{4}}{Q_{3}} > \frac{1 - \lambda_{0}'}{\lambda_{0}'} \eqdef \lambda_{1} \iff \mathcal{F} = \frac{\frac{Q_{4}}{b - 1}}{\frac{Q_{3}}{b(a - 1)}} > \lambda_{1} \frac{b(a - 1)}{b - 1} \eqdef c \]
+
+La statistica $ \mathcal{F} $ ha distribuzione $ F_{b - 1, b(a - 1)}, \forall\ \underline{\theta} \in \mathcal{H}_{0} $, dunque basta imporre $ \alpha = \mathbb{P}_{H_{0}} (\mathcal{F} > c) $ e rigettare $ H_{0} $ se $ \mathcal{F} > c $ con $ c $ tale che $ \phi_{F_{b - 1, b(a - 1)}} (c) = 1 - \alpha $
+
+\begin{center}
+\begin{figure}[H]
+\begin{tikzpicture}[yscale=5]
+\draw[->] (-1, 0) -- (3, 0);
+\draw[->] (0, -0.2) -- (0, 0.4);
+\draw[domain=0:3, smooth, variable=\x, black] plot ({\x}, {2*\x/(8*\x*\x*\x + 12*\x*\x + 6*\x + 1)}) node[above] {$ F_{1, 6} $};
+\draw[dotted] (0.7, 0.101) -- (0.7, 0) node[below] {$ c $};
+\filldraw[pattern=north east lines, pattern color=black!20, domain=0.7:3, smooth, variable=\x] plot ({\x}, {2*\x/(8*\x*\x*\x + 12*\x*\x + 6*\x + 1)}) -| (3, 0) -| (0.7, 0) -- cycle;
+\draw (1, 0.04) node {$ \alpha $};
+\end{tikzpicture}
+\end{figure}
+\end{center}
+
+\section{ANOVA a due fattori con una osservazione per cella}
+Si supponga che l'esito di un esperimento sia influenzato da 2 fattori $ A $ e $ B $.
+
+\begin{es}
+\noindent
+\begin{itemize}
+\item La crescita di una pianta pu\`o essere influenzata dal tipo di seme e dal tipo di fertilizzante usati e si hanno pi\`u scelte possibili per seme e fertilizzante;
+\item Il contenuto medio di un principio attivo in un farmaco (pastiglia, bustina, \ldots) pu\`o essere influenzato dallo stabilimento di produzione e dal giorno di produzione.
+\end{itemize}
+\end{es}
+
+Sia $ X_{ij} $ l'esito dell'esperimento (v.a.) effettuato quando il fattore $ A $ "vale $ i $" e $ B $ "vale $ j $" con $ i = 1, \dotsc, a $ e $ j = 1, \dotsc, b $. Si supponga che
+
+\[ \mathbb{E}[X_{ij}] = \mu_{ij} = \mu + \alpha_{i} + \beta_{j} \]
+
+con $ i = 1, \dotsc, a $ e $ j = 1, \dotsc, b $ dove
+
+\begin{itemize}
+\item $ \mu $ \`e il contributo globale indipendente da $ A $ e $ B $;
+\item $ \alpha_{i} $ \`e il contributo di $ A $;
+\item $ \beta_{j} $ \`e il contributo di $ B $.
+\end{itemize}
+
+e si supponga che
+
+\begin{equation} \label{equation:dot}
+\sum\limits_{i = 1}^{a} \alpha_{i} = \sum\limits_{j = 1}^{b} \beta_{j} = 0
+\end{equation}
+
+Si noti che si pu\`o sempre assumere che $ (\ref{equation:dot}) $ valga. Infatti, se non valesse, basta porre:
+
+\begin{itemize}
+\item $ \overline{\alpha} \defeq \sum\limits_{i = 1}^{a} \frac{\alpha_{i}}{a} $
+\item $ \overline{\beta} \defeq \sum\limits_{j = 1}^{b} \frac{\beta_{j}}{b} $
+\end{itemize}
+
+e si ha
+
+\[ \mu_{ij} = \underbrace{\mu + \overline{\alpha} + \overline{\beta}}_{\mu'} + \underbrace{\alpha_{i} - \overline{\alpha}}_{\alpha_{i}'} + \underbrace{\beta_{j} - \overline{\beta}}_{\beta_{j}'}  \]
+
+e ora $ \sum\limits_{i = 1}^{a} \alpha_{i}' = \sum\limits_{i = 1}^{a} \alpha_{i} - a \overline{\alpha} = 0 $ e analogamente $ \sum\limits_{j = 1}^{b} \beta_{j}' = 0 $. Si assumi inoltre che le $ X_{ij} \sim N(\mu_{ij}, \sigma^{2}), \forall\ i, j $ e che siano indipendenti.
+
+Il modello descritto si dice ANOVA a due fattori con una osservazione per cella, poich\'e per ogni coppia o cella $ (i, j) $ si suppone di avere a disposizione l'esito $ X_{ij} $ di un solo esperimento.
+
+Ci si chiede ora se uno dei fattori influenzi davvero l'esito dell'esperimento, ad esempio il fattore $ B $. Ci\`o equivale a verificare:
+
+\begin{itemize}
+\item $ H_{0}: \beta_{j} = 0, \forall\ j = 1, \dotsc, b $
+\item $ H_{1}: \beta_{j} \ne 0 $ per qualche $ j $
+\end{itemize}
+
+I parametri incogniti sono $ \underline{\theta} = (\mu, \underline{\alpha}, \underline{\beta}, \sigma^{2}) \in \mathcal{H} = \mathbb{R} \times \mathbb{R}^{a} \times \mathbb{R}^{b} \times \mathbb{R}^{+} $ e l'insieme in cui varia $ \underline{\theta} $ \`e $ \mathcal{H}_{0} = \{ \underline{\theta} \in \mathcal{H} : \beta_{1} = \dotsb = \beta_{b} = 0 \} $. Si utilizzi ancora il metodo del rapporto di massima verosimiglianza:
+
+\begin{itemize}
+\item $ L_{\mathcal{H}} (\mu, \underline{\alpha}, \underline{\beta}, \sigma^{2}; x_{ij}) = \left( \frac{1}{2 \pi \sigma^{2}} \right)^{\frac{ab}{2}} e^{- \frac{1}{2 \sigma^{2}} \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \mu - \alpha_{i} - \beta_{j})^{2}} $
+\item $ L_{\mathcal{H}_{0}} (\mu, \underline{\alpha}, \underline{0}, \sigma^{2}; x_{ij}) = \left( \frac{1}{2 \pi \sigma^{2}} \right)^{\frac{ab}{2}} e^{- \frac{1}{2 \sigma^{2}} \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \mu - \alpha_{i})^{2}} $
+\end{itemize}
+
+Massimizzando si ottiene:
+\begin{itemize}
+\item $ \mathcal{H}: \begin{cases} \hat{\hat{\mu}} = \overline{x}_{\cdot \cdot} \\ \hat{\hat{\alpha}}_{i} = \overline{x}_{i \cdot} - \overline{x}_{\cdot \cdot} & i = 1, \dotsc, a  \\ \hat{\hat{\beta}}_{j} = \overline{x}_{\cdot j} - \overline{x}_{\cdot \cdot} & j = 1, \dotsc, b \\ \hat{\hat{\sigma}}^{2} = \frac{1}{ab} \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{i \cdot} - \overline{x}_{\cdot j} + \overline{x}_{\cdot \cdot})^{2} \end{cases} $
+\item $ \mathcal{H}_{0}: \begin{cases} \hat{\mu} = \overline{x}_{\cdot \cdot} \\ \hat{\alpha}_{i} = \overline{x}_{i \cdot} - \overline{x}_{\cdot \cdot} & i = 1, \dotsc, a \\ \hat{\beta}_{j} = 0 & j = 1, \dotsc, b \\ \hat{\sigma}^{2} = \frac{1}{ab} \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (x_{ij} - \overline{x}_{i \cdot})^{2} \eqdef \frac{1}{ab} Q_{2} \end{cases} $
+\end{itemize}
+
+Sostituendo e calcolando il rapporto di massima verosimiglianza si ha
+
+\[ \lambda (X_{ij}) = \left( \frac{\hat{\hat{\sigma}}^{2}}{\hat{\sigma}^{2}} \right)^{\frac{ab}{2}} = \left( \frac{Q_{5}}{Q_{2}} \right)^{\frac{ab}{2}} \]
+
+Rigetto $ H_{0} $ se $ \lambda (x_{ij}) < \lambda_{0} \iff \frac{\hat{\hat{\sigma}}^{2}}{\hat{\sigma}^{2}} < \lambda_{0}^{\frac{2}{ab}} \eqdef c $ con $ \sup\limits_{\underline{\theta} \in \mathcal{H}_{0}} \mathbb{P}_{\underline{\theta}} \left( \frac{\hat{\hat{\sigma}}^{2}}{\hat{\sigma}^{2}} < c \right) = \alpha $.
+
+Si studi la distribuzione di $ \frac{\hat{\hat{\sigma}}^{2}}{\hat{\sigma}^{2}} $. Detti:
+\begin{itemize}
+\item $ Q_{4} = a \sum\limits_{j = 1}^{b} (\overline{x}_{\cdot j} - \overline{x}_{\cdot \cdot})^{2} $
+\item $ Q_{5} = \sum\limits_{j = 1}^{b} \sum\limits_{i = 1}^{a} (\overline{x}_{i j} - \overline{x}_{i \cdot} - \overline{x}_{\cdot j} + \overline{x}_{\cdot \cdot})^{2} $
+\item $ Q_{2} = Q_{4} + Q_{5} $
+\end{itemize}
+
+si noti che
+\[ \frac{\hat{\hat{\sigma}}^{2}}{\hat{\sigma}^{2}} = \frac{1}{1 + \frac{Q_{4}}{Q_{5}}} \]
+
+In modo analogo al caso precedente si prova che, se $ H_{0} $ \`e vera, $ \frac{Q_{4}}{\sigma^{2}} \sim \chi^{2}_{b - 1} $ e $ \frac{Q_{5}}{\sigma^{2}} \sim \chi^{2}_{(a - 1)(b - 1)} $. Inoltre, $ Q_{4} $ e $ Q_{5} $ sono indipendenti, quindi, $ \forall\ \underline{\theta} \in \mathcal{H}_{0} $
+
+\[ \tilde{\mathcal{F}} = \frac{\frac{Q_{4}}{b - 1}}{\frac{Q_{5}}{(a - 1)(b - 1)}} \stackrel{H_{0}}{\sim} F_{b - 1, (a - 1)(b - 1)} \]
+
+Quindi $ \alpha = \mathbb{P}_{H_{0}} \left( \frac{\hat{\hat{\sigma}}^{2}}{\hat{\sigma}^{2}} < c \right) = \mathbb{P}_{H_{0}} \left( \tilde{\mathcal{F}} > c_{1} \right) $ e $ c_{1} $ \`e tale che $ \phi_{F_{b - 1, (a - 1)(b - 1)}} (c_{1}) = 1 - \alpha $
+
+\begin{center}
+\begin{figure}[H]
+\begin{tikzpicture}[yscale=5]
+\draw[->] (-1, 0) -- (3, 0);
+\draw[->] (0, -0.2) -- (0, 0.4);
+\draw[domain=0:3, smooth, variable=\x, black] plot ({\x}, {2*\x/(8*\x*\x*\x + 12*\x*\x + 6*\x + 1)}) node[above] {$ F_{1, 6} $};
+\draw[dotted] (0.7, 0.101) -- (0.7, 0) node[below] {$ c_{1} $};
+\filldraw[pattern=north east lines, pattern color=black!20, domain=0.7:3, smooth, variable=\x] plot ({\x}, {2*\x/(8*\x*\x*\x + 12*\x*\x + 6*\x + 1)}) -| (3, 0) -| (0.7, 0) -- cycle;
+\draw (1, 0.04) node {$ \alpha $};
+\end{tikzpicture}
+\caption{Grafico di $ F_{b - 1, (a - 1)(b - 1)} $ con coda che parte da $ c_{1} $ e di area $ \alpha $ tagliata}
+\end{figure}
+\end{center}
+
+\section{ANOVA a due fattori con pi\`u di una osservazione per cella}
+Si supponga ora che per ogni cella $ (i, j) $ siano disponibili gli esiti di $ c $ esperimenti
+
+\[ X_{ijk} \sim N(\mu_{ij}, \sigma^{2}) \]
+
+indipendenti tra loro, con $ i = 1, \dotsc, a $, $ j = 1, \dotsc, b $ e $ k = 1, \dotsc, c $. Si possono ora stimare i parametri di un modello pi\`u complesso:
+
+\[ \mathbb{E}[X_{ijk}] = \mu_{ij} = \mu + \alpha_{i} + \beta_{j} + \gamma_{ij} \]
+
+dove $ \gamma_{ij} $ rappresenta l'interazione tra i fattori $ A $ e $ B $, con
+\begin{itemize}
+\item $ \sum\limits_{i = 1}^{a} \alpha_{i} = 0 $
+\item $ \sum\limits_{j = 1}^{b} \beta_{j} = 0 $
+\item $ \sum\limits_{i = 1}^{a} \gamma_{ij} = \sum\limits_{j = 1}^{b} \gamma_{ij} = 0 $
+\end{itemize}
+
+Si studi
+\begin{itemize}
+\item $ H_{0}: \gamma_{ij} = 0, \forall\ i, j $
+\item $ H_{1}: \gamma_{ij} \ne 0 $ per qualche $ (i, j) $
+\end{itemize}
+
+con un procedimento simile ai precedenti si trova che
+
+\[ \tilde{\tilde{\mathcal{F}}} = \frac{\frac{c \sum\limits_{i = 1}^{a} \sum\limits_{j = 1}^{b} (\overline{x}_{i j \cdot} - \overline{x}_{i \cdot \cdot} - \overline{x}_{\cdot j \cdot} + \overline{x}_{\cdot \cdot \cdot})^{2}}{(a - 1)(b - 1)}}{\frac{\sum\limits_{k = 1}^{c} \sum\limits_{i = 1}^{a} \sum\limits_{j = 1}^{b} (x_{ijk} - \overline{x}_{i j \cdot})^{2}}{ab (c - 1)}} \]
+
+$ \tilde{\tilde{\mathcal{F}}} \stackrel{H_{0}}{\sim} F_{(a - 1)(b - 1), ab(c - 1)}, \forall\ \underline{\theta} \in \mathcal{H}_{0} $ quindi rigetto $ H_{0} $ se $ \tilde{\tilde{\mathcal{F}}} > c $ con $ \mathbb{P}_{H_{0}} (\tilde{\tilde{\mathcal{F}}} > c) = \alpha $ 
+
+\end{document}
